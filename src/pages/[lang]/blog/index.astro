@@ -1,0 +1,51 @@
+---
+/**
+ * Blog list — live from Wix Blog API.
+ * Publishing a post in the dashboard makes it appear here without a redeploy (SSR).
+ */
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { isLocale, DEFAULT_LOCALE, type Locale } from '../../../lib/locales';
+import { listBlogPosts, formatPostDate } from '../../../lib/blog';
+import { listNavPages } from '../../../lib/cms';
+
+const rawLang = Astro.params.lang;
+if (!isLocale(rawLang)) {
+  return Astro.redirect(`/${DEFAULT_LOCALE}/blog`, 302);
+}
+const locale = rawLang as Locale;
+
+const { posts: blogPosts, error } = await listBlogPosts();
+const navPages = await listNavPages(locale);
+---
+
+<SiteLayout locale={locale} title="Blog" pathWithoutLang="/blog" navPages={navPages}>
+  <section class="blog-list">
+    <h1>Blog</h1>
+    <p class="muted">Updates from the Workofo team — managed in the Wix Blog editor.</p>
+
+    {error && <p class="dev-msg">{error}</p>}
+
+    {
+      !error && blogPosts.length === 0 && (
+        <p class="muted">No published posts yet. Publish one in the Wix dashboard Blog app.</p>
+      )
+    }
+
+    <div class="blog-list__grid">
+      {
+        blogPosts.map((post) => (
+          <article class="blog-card">
+            <a href={`/${locale}/blog/${post.slug}`}>
+              <div class="blog-card__cover">
+                {post.coverImageUrl ? <img src={post.coverImageUrl} alt="" /> : null}
+              </div>
+              <h2>{post.title}</h2>
+              <p class="blog-card__meta">{formatPostDate(post.firstPublishedDate, locale)}</p>
+              {post.excerpt && <p>{post.excerpt}</p>}
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</SiteLayout>

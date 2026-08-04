@@ -1,0 +1,65 @@
+---
+/**
+ * Blog post detail — SEO wired for dashboard-managed tags.
+ * SSR so new/updated posts appear without a code redeploy.
+ */
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import RicosContentViewer from '../../../components/RicosContentViewer';
+import { isLocale, DEFAULT_LOCALE, type Locale } from '../../../lib/locales';
+import { getBlogPostBySlug, formatPostDate } from '../../../lib/blog';
+import { listNavPages } from '../../../lib/cms';
+import { imgSrc } from '../../../lib/rich';
+import { WIX_APPS } from '@wix/essentials';
+import { seoTags } from '@wix/seo';
+import { SEO } from '@wix/seo/components';
+import { loadSEOTagsServiceConfig } from '@wix/seo/services';
+
+export const wixMetadata = {
+  appDefId: WIX_APPS.blogs.id,
+  pageIdentifier: WIX_APPS.blogs.postPageMetadata.pageIdentifier,
+  identifiers: { postSlug: WIX_APPS.blogs.postPageMetadata.identifiers.slug },
+};
+
+const rawLang = Astro.params.lang;
+const postSlug = Astro.params.postSlug;
+
+if (!isLocale(rawLang) || !postSlug) {
+  return Astro.redirect(`/${DEFAULT_LOCALE}/blog`, 302);
+}
+const locale = rawLang as Locale;
+
+const [{ post, error }, navPages, seoTagsServiceConfig] = await Promise.all([
+  getBlogPostBySlug(postSlug),
+  listNavPages(locale),
+  loadSEOTagsServiceConfig({
+    pageUrl: Astro.url.href,
+    itemType: seoTags.ItemType.BLOG_POST,
+    itemData: { slug: postSlug },
+  }).catch(() => null),
+]);
+
+if (!post && !error) {
+  return Astro.redirect(`/${locale}/blog`, 302);
+}
+
+const title = (post as any)?.title || 'Blog post';
+const cover = imgSrc((post as any)?.media?.wixMedia?.image || (post as any)?.coverImage, 1200, 630);
+---
+
+<SiteLayout locale={locale} title="" pathWithoutLang={`/blog/${postSlug}`} navPages={navPages}>
+  {seoTagsServiceConfig && <SEO.Tags seoTagsServiceConfig={seoTagsServiceConfig} slot="seo-tags" />}
+
+  <article class="blog-post">
+    {error && <p class="dev-msg">{error}</p>}
+    {
+      post && (
+        <>
+          <p class="blog-card__meta">{formatPostDate((post as any).firstPublishedDate, locale)}</p>
+          <h1>{(post as any).title}</h1>
+          {cover && <img src={cover} alt="" style="border-radius: 14px; margin: 1.25rem 0;" />}
+          <RicosContentViewer client:only="react" content={(post as any).richContent} />
+        </>
+      )
+    }
+  </article>
+</SiteLayout>

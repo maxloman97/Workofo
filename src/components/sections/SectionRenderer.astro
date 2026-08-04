@@ -1,0 +1,77 @@
+---
+import type { CmsSection } from '../../lib/cms';
+import {
+  Cta,
+  FeatureGrid,
+  Hero,
+  Pricing,
+  RichText,
+  Testimonial,
+  TextImage,
+} from './Blocks';
+import DemoForm from './DemoForm';
+
+type FormField = {
+  target: string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  format?: string;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  viewFieldType?: string;
+  options?: Array<{ value: string; label: string }>;
+};
+
+type Props = {
+  sections: CmsSection[];
+  formFields?: FormField[];
+  formId?: string;
+  formLoadError?: string;
+};
+
+const { sections, formFields = [], formId, formLoadError } = Astro.props as Props;
+---
+
+{
+  sections.map((section) => {
+    const type = (section.type || '').trim();
+    switch (type) {
+      case 'hero':
+        return <Hero section={section} />;
+      case 'textImage':
+        return <TextImage section={section} />;
+      case 'richText':
+        return <RichText section={section} />;
+      case 'featureGrid':
+        return <FeatureGrid section={section} />;
+      case 'pricing':
+        return <Pricing section={section} />;
+      case 'testimonial':
+        return <Testimonial section={section} />;
+      case 'cta':
+        return <Cta section={section} />;
+      case 'demoForm':
+        return (
+          <DemoForm
+            client:load
+            heading={section.heading}
+            subheading={section.subheading}
+            fields={formFields}
+            formId={formId}
+            loadError={formLoadError}
+          />
+        );
+      default:
+        return (
+          <section class="unknown-section">
+            <p class="dev-msg">
+              Unknown section type “{type || '(empty)'}”. Supported: hero, textImage, richText,
+              featureGrid, pricing, testimonial, cta, demoForm.
+            </p>
+          </section>
+        );
+    }
+  })
+}

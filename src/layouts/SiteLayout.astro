@@ -1,0 +1,78 @@
+---
+import { LOCALES, LOCALE_LABELS, htmlLang, type Locale } from '../lib/locales';
+import { SITE_NAME } from '../lib/config';
+import '../styles/global.css';
+
+type Props = {
+  locale: Locale;
+  title: string;
+  description?: string;
+  pathWithoutLang?: string; // e.g. "/home" or "/blog/foo"
+  navPages?: Array<{ slug?: string; title?: string }>;
+};
+
+const { locale, title, description, pathWithoutLang = '', navPages = [] } = Astro.props;
+const lang = htmlLang(locale);
+const origin = Astro.url.origin;
+const currentPath = pathWithoutLang.startsWith('/') ? pathWithoutLang : `/${pathWithoutLang}`;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {title && <title>{title}</title>}
+    {description && <meta name="description" content={description} />}
+    <slot name="seo-tags" />
+    {
+      LOCALES.map((l) => (
+        <link
+          rel="alternate"
+          hreflang={htmlLang(l)}
+          href={`${origin}/${l}${currentPath === '/' ? '' : currentPath}`}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={`${origin}/lt${currentPath === '/' ? '' : currentPath}`} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href={`/${locale}/home`}>{SITE_NAME}</a>
+        <nav aria-label="Primary">
+          {
+            navPages
+              .filter((p) => p.slug && p.slug !== 'home')
+              .map((p) => (
+                <a href={`/${locale}/${p.slug}`}>{p.title || p.slug}</a>
+              ))
+          }
+          <a href={`/${locale}/blog`}>Blog</a>
+        </nav>
+        <div class="lang-switch" role="navigation" aria-label="Language">
+          {
+            LOCALES.map((l) => (
+              <a
+                href={`/${l}${currentPath === '/' ? '/home' : currentPath}`}
+                class:list={[{ active: l === locale }]}
+                hreflang={htmlLang(l)}
+              >
+                {LOCALE_LABELS[l]}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>© {new Date().getFullYear()} {SITE_NAME}. Content managed in Wix CMS.</p>
+    </footer>
+  </body>
+</html>
