@@ -1,15 +1,12 @@
 ---
 /**
  * Dynamic CMS page: /[lang]/[slug]
- *
- * SSR against live Wix Data (output: "server") so dashboard edits to Pages/Sections
- * show on the next request without a code redeploy — that is what makes
- * "edit in dashboard → live site" work for Features 1, 3, and 4.
+ * SSR against SitePages / SiteSections — dashboard edits need no redeploy.
  */
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import SectionRenderer from '../../components/sections/SectionRenderer.astro';
-import { isLocale, DEFAULT_LOCALE, type Locale } from '../../lib/locales';
-import { loadPageBySlug, listNavPages } from '../../lib/cms';
+import { isLocale, DEFAULT_LOCALE, ui, type Locale } from '../../lib/locales';
+import { loadPageBySlug, listNavPages, SITE_PAGES } from '../../lib/cms';
 import { DEMO_FORM_ID } from '../../lib/config';
 import { forms } from '@wix/forms';
 
@@ -22,7 +19,6 @@ if (!isLocale(rawLang) || !slug) {
 
 const locale = rawLang as Locale;
 
-// Reserved: blog routes live under /[lang]/blog
 if (slug === 'blog') {
   return Astro.redirect(`/${locale}/blog`, 302);
 }
@@ -35,7 +31,7 @@ try {
     status: 'cms_error' as const,
     error: {
       kind: 'query_failed' as const,
-      collection: 'Pages',
+      collection: SITE_PAGES,
       message: 'Unexpected CMS error while loading the page.',
       detail: String((err as Error)?.message ?? err),
     },
@@ -71,7 +67,7 @@ if (needsForm) {
       }));
     formFields = fields;
   } catch (err) {
-    formLoadError = `Could not load form schema for PUBLIC_WIX_DEMO_FORM_ID=${DEMO_FORM_ID}. Create the form in Wix Forms & Submissions. Detail: ${String((err as Error)?.message ?? err)}`;
+    formLoadError = `Could not load form schema for PUBLIC_WIX_DEMO_FORM_ID=${DEMO_FORM_ID}. Detail: ${String((err as Error)?.message ?? err)}`;
   }
 }
 
@@ -79,9 +75,9 @@ const pageTitle =
   result.status === 'ok'
     ? result.page.title || slug
     : result.status === 'not_translated'
-      ? 'Not translated yet'
+      ? ui('notTranslated', locale)
       : result.status === 'not_found'
-        ? 'Page not found'
+        ? ui('pageNotFound', locale)
         : 'CMS setup needed';
 ---
 
@@ -93,6 +89,9 @@ const pageTitle =
         formFields={formFields}
         formId={DEMO_FORM_ID}
         formLoadError={formLoadError}
+        locale={locale}
+        pageSlug={slug}
+        pageLabel={result.page.navLabel || result.page.title || slug}
       />
     )
   }
@@ -100,14 +99,13 @@ const pageTitle =
   {
     result.status === 'not_translated' && (
       <section class="not-translated">
-        <h1>Not translated yet</h1>
+        <h1>{ui('notTranslated', locale)}</h1>
         <p>
-          This page (“{slug}”) does not have a <strong>{locale}</strong> version in the CMS yet.
-          Localization is driven by the Pages.language field — add a Pages item with language=
-          {locale} and matching slug, then attach Sections.
+          This page (“{slug}”) does not have a <strong>{locale}</strong> version in SitePages yet.
+          Add a SitePages item with language={locale} and matching slug, then attach SiteSections.
         </p>
         <p>
-          <a class="btn btn--primary" href={`/lt/${slug}`}>View Lithuanian version</a>
+          <a class="btn btn--primary" href={`/${DEFAULT_LOCALE}/${slug}`}>{ui('viewLt', locale)}</a>
         </p>
       </section>
     )
@@ -116,13 +114,12 @@ const pageTitle =
   {
     result.status === 'not_found' && (
       <section class="not-translated">
-        <h1>Page not found</h1>
+        <h1>{ui('pageNotFound', locale)}</h1>
         <p>
-          No CMS Pages item with slug “{slug}” for language “{locale}”. Create one in the Wix
-          dashboard (collection: Pages).
+          No SitePages item with slug “{slug}” for language “{locale}”.
         </p>
         <p>
-          <a href={`/${locale}/home`}>Back home</a>
+          <a href={`/${locale}/home`}>{ui('backHome', locale)}</a>
         </p>
       </section>
     )
@@ -130,7 +127,7 @@ const pageTitle =
 
   {
     result.status === 'cms_error' && (
-      <section>
+      <section class="shell__inner" style="padding: 4rem 1.5rem;">
         <h1>CMS setup needed</h1>
         <p class="dev-msg">
           {result.error.message}

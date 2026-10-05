@@ -6,6 +6,15 @@
 export const DEMO_FORM_ID =
   (typeof import.meta !== 'undefined' &&
     (import.meta as ImportMeta & { env?: Record<string, string> }).env?.PUBLIC_WIX_DEMO_FORM_ID) ||
-  '59bbe7d1-bc2b-4575-9091-109371c66216';
+  '6486f3c4-153f-4704-9180-82dc3572dc2f';
 
 export const SITE_NAME = 'Workofo';
+
+/** Product app login (opens in a new tab). */
+export const LOGIN_URL = 'https://app.workofo.com/login';
+
+/**
+ * Hero “Watch a video” target.
+ * Matches current workofo.com overview CTA until a dedicated video URL is set.
+ */
+export const WATCH_VIDEO_URL = 'https://www.workofo.com/industries';

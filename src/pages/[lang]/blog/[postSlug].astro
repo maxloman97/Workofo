@@ -1,7 +1,6 @@
 ---
 /**
  * Blog post detail — SEO wired for dashboard-managed tags.
- * SSR so new/updated posts appear without a code redeploy.
  */
 import SiteLayout from '../../../layouts/SiteLayout.astro';
 import RicosContentViewer from '../../../components/RicosContentViewer';
@@ -54,9 +53,9 @@ const cover = imgSrc((post as any)?.media?.wixMedia?.image || (post as any)?.cov
     {
       post && (
         <>
-          <p class="blog-card__meta">{formatPostDate((post as any).firstPublishedDate, locale)}</p>
+          <p class="blog-card__meta t-overline">{formatPostDate((post as any).firstPublishedDate, locale)}</p>
           <h1>{(post as any).title}</h1>
-          {cover && <img src={cover} alt="" style="border-radius: 14px; margin: 1.25rem 0;" />}
+          {cover && <img class="blog-post__cover" src={cover} alt="" />}
           <RicosContentViewer client:only="react" content={(post as any).richContent} />
         </>
       )

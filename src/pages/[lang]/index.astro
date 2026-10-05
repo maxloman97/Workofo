@@ -3,7 +3,7 @@ import { isLocale, DEFAULT_LOCALE } from '../../lib/locales';
 
 const raw = Astro.params.lang;
 if (!isLocale(raw)) {
-  return Astro.redirect(`/${DEFAULT_LOCALE}`, 302);
+  return Astro.redirect(`/${DEFAULT_LOCALE}/home`, 301);
 }
-return Astro.redirect(`/${raw}/home`, 302);
+return Astro.redirect(`/${raw}/home`, 301);
 ---

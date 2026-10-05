@@ -1,20 +1,34 @@
 ---
-import { LOCALES, LOCALE_LABELS, htmlLang, type Locale } from '../lib/locales';
-import { SITE_NAME } from '../lib/config';
+import { LOCALES, LOCALE_LABELS, LOCALE_NAMES, htmlLang, ui, type Locale } from '../lib/locales';
+import { LOGIN_URL, SITE_NAME } from '../lib/config';
+import { listIndustrySolutions } from '../lib/solutions';
+import FlagIcon from '../components/FlagIcon.astro';
 import '../styles/global.css';
+
+type NavPage = { slug?: string; title?: string; navLabel?: string; navOrder?: number };
 
 type Props = {
   locale: Locale;
   title: string;
   description?: string;
-  pathWithoutLang?: string; // e.g. "/home" or "/blog/foo"
-  navPages?: Array<{ slug?: string; title?: string }>;
+  pathWithoutLang?: string;
+  navPages?: NavPage[];
 };
 
 const { locale, title, description, pathWithoutLang = '', navPages = [] } = Astro.props;
 const lang = htmlLang(locale);
 const origin = Astro.url.origin;
 const currentPath = pathWithoutLang.startsWith('/') ? pathWithoutLang : `/${pathWithoutLang}`;
+
+const nav = [...navPages]
+  .filter((p) => p.slug && p.slug !== 'home')
+  .sort((a, b) => (a.navOrder ?? 99) - (b.navOrder ?? 99));
+
+const solutions = listIndustrySolutions().map((item) => ({
+  slug: item.slug,
+  label: item.navLabel[locale] ?? item.navLabel.en,
+}));
+const isSolutionsActive = currentPath.startsWith('/solutions/');
 ---
 
 <!doctype html>
@@ -35,44 +49,95 @@ const currentPath = pathWithoutLang.startsWith('/') ? pathWithoutLang : `/${path
         />
       ))
     }
-    <link rel="alternate" hreflang="x-default" href={`${origin}/lt${currentPath === '/' ? '' : currentPath}`} />
+    <link rel="alternate" hreflang="x-default" href={`${origin}/en${currentPath === '/' ? '/home' : currentPath}`} />
     <slot name="head" />
   </head>
   <body>
-    <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header">
+    <a class="skip" href="#main">{ui('skip', locale)}</a>
+    <header class="site-header" data-site-header>
       <div class="site-header__inner">
-        <a class="brand" href={`/${locale}/home`}>{SITE_NAME}</a>
-        <nav aria-label="Primary">
+        <a class="brand" href={`/${locale}/home`}>
+          <img
+            src="/workofo-logo.png?v=4"
+            alt={SITE_NAME}
+            width="150"
+            height="25"
+            decoding="async"
+          />
+        </a>
+        <nav class="site-nav" aria-label="Primary">
+          <details class:list={['nav-dropdown', { 'is-active': isSolutionsActive }]}>
+            <summary class="nav-dropdown__trigger">
+              {ui('solutions', locale)}
+              <svg class="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </summary>
+            <div class="nav-dropdown__menu">
+              {
+                solutions.map((item) => (
+                  <a
+                    href={`/${locale}/solutions/${item.slug}`}
+                    class:list={[
+                      'nav-dropdown__option',
+                      { 'is-active': currentPath === `/solutions/${item.slug}` },
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                ))
+              }
+            </div>
+          </details>
           {
-            navPages
-              .filter((p) => p.slug && p.slug !== 'home')
-              .map((p) => (
-                <a href={`/${locale}/${p.slug}`}>{p.title || p.slug}</a>
-              ))
-          }
-          <a href={`/${locale}/blog`}>Blog</a>
-        </nav>
-        <div class="lang-switch" role="navigation" aria-label="Language">
-          {
-            LOCALES.map((l) => (
-              <a
-                href={`/${l}${currentPath === '/' ? '/home' : currentPath}`}
-                class:list={[{ active: l === locale }]}
-                hreflang={htmlLang(l)}
-              >
-                {LOCALE_LABELS[l]}
-              </a>
+            nav.map((p) => (
+              <a href={`/${locale}/${p.slug}`}>{p.navLabel || p.title || p.slug}</a>
             ))
           }
+          <a href={`/${locale}/blog`}>{ui('blog', locale)}</a>
+        </nav>
+        <div class="header-actions">
+          <details class="lang-dropdown">
+            <summary class="lang-dropdown__trigger" aria-label="Language">
+              <FlagIcon locale={locale} />
+              <span class="lang-dropdown__code">{LOCALE_LABELS[locale]}</span>
+              <svg class="lang-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </summary>
+            <div class="lang-dropdown__menu" role="listbox">
+              {
+                LOCALES.map((l) => (
+                  <a
+                    href={`/${l}${currentPath === '/' ? '/home' : currentPath}`}
+                    class:list={['lang-dropdown__option', { 'is-active': l === locale }]}
+                    hreflang={htmlLang(l)}
+                    role="option"
+                    aria-selected={l === locale}
+                  >
+                    <FlagIcon locale={l} />
+                    <span>{LOCALE_NAMES[l]}</span>
+                  </a>
+                ))
+              }
+            </div>
+          </details>
+          <a class="btn btn--ghost btn--header" href={LOGIN_URL} target="_blank" rel="noreferrer noopener">
+            {ui('login', locale)}
+          </a>
+          <a class="btn btn--primary btn--header" href={`/${locale}/get-in-touch`}>{ui('bookDemo', locale)}</a>
         </div>
       </div>
     </header>
-    <main id="main">
+    <main id="main" class="shell">
       <slot />
     </main>
     <footer class="site-footer">
-      <p>© {new Date().getFullYear()} {SITE_NAME}. Content managed in Wix CMS.</p>
+      <div class="site-footer__inner">
+        <p>© {new Date().getFullYear()} {SITE_NAME}. {ui('footerCopy', locale)}</p>
+        <p class="t-caption">{ui('footerLegal', locale)}</p>
+      </div>
     </footer>
+    <script is:inline src="/aura.js"></script>
   </body>
 </html>

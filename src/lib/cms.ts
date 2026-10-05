@@ -1,11 +1,17 @@
 import { items } from '@wix/data';
 import type { Locale } from './locales';
+import { DEFAULT_LOCALE, LOCALES } from './locales';
+
+export const SITE_PAGES = 'SitePages';
+export const SITE_SECTIONS = 'SiteSections';
 
 export type CmsPage = {
   _id: string;
   title?: string;
   slug?: string;
   language?: string;
+  navLabel?: string;
+  navOrder?: number;
 };
 
 export type CmsSection = {
@@ -41,15 +47,14 @@ function isMissingCollection(err: unknown): boolean {
 }
 
 /**
- * SSR fetch — no long-lived cache.
- * Dashboard CMS edits appear on the next request without a code redeploy
- * because pages render on the server against live Wix Data.
+ * SSR fetch against SitePages / SiteSections (new redesign CMS).
+ * Dashboard edits appear on the next request without a code redeploy.
  */
 export async function loadPageBySlug(locale: Locale, slug: string): Promise<PageLoadResult> {
   let pageRows: CmsPage[] = [];
   try {
     const result = await items
-      .query('Pages')
+      .query(SITE_PAGES)
       .eq('slug', slug)
       .eq('language', locale)
       .limit(1)
@@ -61,9 +66,8 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
         status: 'cms_error',
         error: {
           kind: 'missing_collection',
-          collection: 'Pages',
-          message:
-            'CMS collection "Pages" is missing. In the Wix dashboard create a collection named Pages with fields: title (Text), slug (Text), language (Text).',
+          collection: SITE_PAGES,
+          message: `CMS collection "${SITE_PAGES}" is missing. Run scripts/seed.mjs to create SitePages / SiteSections.`,
           detail: String((err as Error)?.message ?? err),
         },
       };
@@ -72,8 +76,8 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
       status: 'cms_error',
       error: {
         kind: 'query_failed',
-        collection: 'Pages',
-        message: 'Failed to query Pages. Check collection fields and permissions (read: Anyone).',
+        collection: SITE_PAGES,
+        message: `Failed to query ${SITE_PAGES}. Check fields and permissions (read: Anyone).`,
         detail: String((err as Error)?.message ?? err),
       },
     };
@@ -81,16 +85,19 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
 
   const page = pageRows[0];
   if (!page) {
-    // Exists in default language?
+    // Check whether this slug exists in any other language (prefer default EN).
     try {
-      const fallback = await items
-        .query('Pages')
-        .eq('slug', slug)
-        .eq('language', 'lt')
-        .limit(1)
-        .find();
-      if ((fallback.items ?? []).length > 0) {
-        return { status: 'not_translated', slug, locale };
+      for (const other of [DEFAULT_LOCALE, ...LOCALES.filter((l) => l !== locale && l !== DEFAULT_LOCALE)]) {
+        if (other === locale) continue;
+        const fallback = await items
+          .query(SITE_PAGES)
+          .eq('slug', slug)
+          .eq('language', other)
+          .limit(1)
+          .find();
+        if ((fallback.items ?? []).length > 0) {
+          return { status: 'not_translated', slug, locale };
+        }
       }
     } catch {
       /* ignore */
@@ -101,7 +108,7 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
   let sections: CmsSection[] = [];
   try {
     const sec = await items
-      .query('Sections')
+      .query(SITE_SECTIONS)
       .eq('page', page._id)
       .ascending('order')
       .limit(100)
@@ -113,9 +120,8 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
         status: 'cms_error',
         error: {
           kind: 'missing_collection',
-          collection: 'Sections',
-          message:
-            'CMS collection "Sections" is missing. Create Sections with fields: page (Reference→Pages), order (Number), type (Text), heading, subheading, body (Rich Text), image (Image), ctaLabel, ctaUrl, items (Text).',
+          collection: SITE_SECTIONS,
+          message: `CMS collection "${SITE_SECTIONS}" is missing. Run scripts/seed.mjs.`,
           detail: String((err as Error)?.message ?? err),
         },
       };
@@ -124,8 +130,8 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
       status: 'cms_error',
       error: {
         kind: 'query_failed',
-        collection: 'Sections',
-        message: 'Failed to query Sections. Ensure the page reference field and read permissions are set.',
+        collection: SITE_SECTIONS,
+        message: `Failed to query ${SITE_SECTIONS}.`,
         detail: String((err as Error)?.message ?? err),
       },
     };
@@ -136,7 +142,12 @@ export async function loadPageBySlug(locale: Locale, slug: string): Promise<Page
 
 export async function listNavPages(locale: Locale): Promise<CmsPage[]> {
   try {
-    const result = await items.query('Pages').eq('language', locale).ascending('slug').limit(50).find();
+    const result = await items
+      .query(SITE_PAGES)
+      .eq('language', locale)
+      .ascending('navOrder')
+      .limit(50)
+      .find();
     return (result.items ?? []) as CmsPage[];
   } catch {
     return [];

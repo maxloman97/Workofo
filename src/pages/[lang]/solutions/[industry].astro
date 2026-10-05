@@ -1,0 +1,28 @@
+---
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import IndustrySolutionPage from '../../../components/solutions/IndustrySolutionPage.astro';
+import { isLocale, DEFAULT_LOCALE, type Locale } from '../../../lib/locales';
+import { isIndustrySlug, resolveIndustrySolution } from '../../../lib/solutions';
+import { listNavPages } from '../../../lib/cms';
+
+const rawLang = Astro.params.lang;
+const industry = Astro.params.industry;
+
+if (!isLocale(rawLang) || !isIndustrySlug(industry)) {
+  return Astro.redirect(`/${DEFAULT_LOCALE}/solutions/retail`, 302);
+}
+
+const locale = rawLang as Locale;
+const solution = resolveIndustrySolution(industry, locale);
+const navPages = await listNavPages(locale);
+---
+
+<SiteLayout
+  locale={locale}
+  title={solution.metaTitle}
+  description={solution.metaDescription}
+  pathWithoutLang={`/solutions/${industry}`}
+  navPages={navPages}
+>
+  <IndustrySolutionPage solution={solution} locale={locale} />
+</SiteLayout>

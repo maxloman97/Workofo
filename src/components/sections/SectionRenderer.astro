@@ -1,13 +1,17 @@
 ---
 import type { CmsSection } from '../../lib/cms';
+import type { Locale } from '../../lib/locales';
 import {
-  Cta,
-  FeatureGrid,
+  Benefits,
+  CaseStudies,
   Hero,
-  Pricing,
+  JobList,
+  LogoStrip,
+  PageHero,
+  Problem,
   RichText,
+  Steps,
   Testimonial,
-  TextImage,
 } from './Blocks';
 import DemoForm from './DemoForm';
 
@@ -29,9 +33,25 @@ type Props = {
   formFields?: FormField[];
   formId?: string;
   formLoadError?: string;
+  locale?: Locale;
+  pageSlug?: string;
+  pageLabel?: string;
 };
 
-const { sections, formFields = [], formId, formLoadError } = Astro.props as Props;
+const {
+  sections,
+  formFields = [],
+  formId,
+  formLoadError,
+  locale = 'en',
+  pageSlug = '',
+  pageLabel = '',
+} = Astro.props as Props;
+
+const SIMPLE_HERO_SLUGS = new Set(['jobs', 'get-in-touch']);
+
+const SUPPORTED =
+  'hero, logoStrip, problem, steps, benefits, testimonial, caseStudies, demoForm, richText, jobList';
 ---
 
 {
@@ -39,19 +59,26 @@ const { sections, formFields = [], formId, formLoadError } = Astro.props as Prop
     const type = (section.type || '').trim();
     switch (type) {
       case 'hero':
-        return <Hero section={section} />;
-      case 'textImage':
-        return <TextImage section={section} />;
-      case 'richText':
-        return <RichText section={section} />;
-      case 'featureGrid':
-        return <FeatureGrid section={section} />;
-      case 'pricing':
-        return <Pricing section={section} />;
+        if (SIMPLE_HERO_SLUGS.has(pageSlug) && pageLabel) {
+          return <PageHero label={pageLabel} />;
+        }
+        return <Hero section={section} locale={locale} />;
+      case 'logoStrip':
+        return <LogoStrip section={section} />;
+      case 'problem':
+        return <Problem section={section} />;
+      case 'steps':
+        return <Steps section={section} />;
+      case 'benefits':
+        return <Benefits section={section} locale={locale} />;
       case 'testimonial':
         return <Testimonial section={section} />;
-      case 'cta':
-        return <Cta section={section} />;
+      case 'caseStudies':
+        return <CaseStudies section={section} />;
+      case 'richText':
+        return <RichText section={section} />;
+      case 'jobList':
+        return <JobList section={section} />;
       case 'demoForm':
         return (
           <DemoForm
@@ -61,14 +88,14 @@ const { sections, formFields = [], formId, formLoadError } = Astro.props as Prop
             fields={formFields}
             formId={formId}
             loadError={formLoadError}
+            locale={locale}
           />
         );
       default:
         return (
-          <section class="unknown-section">
+          <section class="shell__inner">
             <p class="dev-msg">
-              Unknown section type “{type || '(empty)'}”. Supported: hero, textImage, richText,
-              featureGrid, pricing, testimonial, cta, demoForm.
+              Unknown section type “{type || '(empty)'}”. Supported: {SUPPORTED}.
             </p>
           </section>
         );

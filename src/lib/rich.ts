@@ -7,7 +7,7 @@ export function imgSrc(value: unknown, w = 1200, h = 800): string {
     if (value.startsWith('wix:image://')) {
       return media.getScaledToFillImageUrl(value, w, h, {});
     }
-    if (value.startsWith('http://') || value.startsWith('https://')) return value;
+    if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('/')) return value;
     return '';
   }
   if (typeof value === 'object' && value && 'url' in value) {

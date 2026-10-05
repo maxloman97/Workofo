@@ -1,0 +1,92 @@
+---
+import type { ResolvedIndustrySolution } from '../../lib/solutions';
+import { ui, type Locale } from '../../lib/locales';
+
+type Props = {
+  solution: ResolvedIndustrySolution;
+  locale: Locale;
+};
+
+const { solution, locale } = Astro.props;
+const demoHref = `/${locale}/get-in-touch`;
+---
+
+<article class="solution-page">
+  <header class="solution-hero shell__inner">
+    <p class="t-overline section__eyebrow">{solution.eyebrow}</p>
+    <h1>{solution.headline}</h1>
+    <p class="lede">{solution.lede}</p>
+    <div class="solution-hero__actions">
+      <a class="btn btn--primary btn--cta" href={demoHref}>{ui('bookDemo', locale)}</a>
+    </div>
+    {
+      solution.stats.length > 0 && (
+        <dl class="solution-stats">
+          {solution.stats.map((stat) => (
+            <div class="solution-stats__item">
+              <dt>{stat.value}</dt>
+              <dd>{stat.label}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+  </header>
+
+  <section class="solution-challenges shell__inner" aria-labelledby="solution-challenges-title">
+    <h2 id="solution-challenges-title" class="visually-hidden">Industry challenges</h2>
+    <div class="solution-challenges__grid">
+      {
+        solution.challenges.map((challenge) => (
+          <article class="solution-challenges__card">
+            <h3>{challenge.title}</h3>
+            <ul>
+              {challenge.points.map((point) => (
+                <li>{point}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="solution-features shell__inner" aria-labelledby="solution-features-title">
+    <h2 id="solution-features-title" class="visually-hidden">Key capabilities</h2>
+    <div class="solution-features__grid">
+      {
+        solution.features.map((feature) => (
+          <article class="solution-features__card">
+            <h3>{feature.title}</h3>
+            <p>{feature.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    solution.sections.map((section, index) => (
+      <section
+        class:list={['solution-band shell__inner', { 'solution-band--alt': index % 2 === 1 }]}
+        data-reveal
+      >
+        <div class="solution-band__copy">
+          <h2>{section.title}</h2>
+          <p class="lede">{section.intro}</p>
+          <ul class="solution-band__list">
+            {section.points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="solution-cta shell__inner" data-reveal>
+    <h2>{solution.ctaHeadline}</h2>
+    <p class="lede">{solution.ctaBody}</p>
+    <a class="btn btn--primary btn--cta" href={demoHref}>{ui('bookDemo', locale)}</a>
+  </section>
+</article>

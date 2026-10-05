@@ -1,0 +1,610 @@
+---
+/**
+ * Internal design system / component gallery.
+ * URL: /design-system — not linked from site nav (noindex).
+ */
+import SiteLayout from '../layouts/SiteLayout.astro';
+import FlagIcon from '../components/FlagIcon.astro';
+import {
+  Benefits,
+  CaseStudies,
+  Hero,
+  JobList,
+  LogoStrip,
+  Problem,
+  RichText,
+  Steps,
+  Testimonial,
+} from '../components/sections/Blocks';
+import DemoForm from '../components/sections/DemoForm';
+import type { CmsSection } from '../lib/cms';
+import { listNavPages } from '../lib/cms';
+import { LOCALES, LOCALE_NAMES, type Locale } from '../lib/locales';
+
+const locale: Locale = 'en';
+const navPages = await listNavPages(locale);
+
+const section = (partial: Partial<CmsSection> & { type: string; _id: string }): CmsSection => ({
+  ...partial,
+});
+
+const hero = section({
+  _id: 'ds-hero',
+  type: 'hero',
+  heading: 'Unlock 15% more workforce capacity with AI scheduling.',
+  subheading: 'Workofo plans shifts, covers gaps, and keeps compliance tight — so managers stop firefighting rotas.',
+  ctaUrl: `/${locale}/get-in-touch`,
+});
+
+const logoStrip = section({
+  _id: 'ds-logos',
+  type: 'logoStrip',
+  heading: 'Some of our clients',
+  subheading: 'Trusted by teams across Europe to improve coverage, productivity, and schedule quality with AI.',
+  items: [
+    { name: 'Telenordi', image: '/clients/telenordi.png?v=2' },
+    { name: 'Senukai', image: '/clients/senukai.png?v=2' },
+    { name: 'Barbora', image: '/clients/barbora.png?v=2' },
+    { name: 'Tele2', image: '/clients/tele2.png?v=2' },
+    { name: 'Planas Chuliganas', image: '/clients/planas-chuliganas.png?v=2' },
+  ],
+});
+
+const problem = section({
+  _id: 'ds-problem',
+  type: 'problem',
+  heading: 'Scheduling is still stuck in spreadsheets.',
+  subheading: 'Managers lose hours every week patching gaps and chasing availability.',
+  items: [
+    { title: 'Last-minute chaos', body: 'Sick leave and no-shows cascade into overtime and unhappy teams.', image: '/problem/static-schedules.png?v=2' },
+    { title: 'Compliance risk', body: 'Rest rules and contract hours are easy to miss when plans live in Excel.', image: '/problem/complex-rules.png?v=2' },
+    { title: 'Hidden capacity', body: 'You cannot see who can pick up shifts until someone starts calling around.', image: '/problem/mismatch.png?v=2' },
+  ],
+});
+
+const steps = section({
+  _id: 'ds-steps',
+  type: 'steps',
+  heading: 'How it works',
+  subheading: 'From demand to published rota in three steps.',
+  ctaLabel: 'Most teams go live in under two weeks.',
+  items: [
+    { title: 'Connect your workforce', body: 'Import roles, contracts, skills, and availability once.' },
+    { title: 'Let AI draft the plan', body: 'Workofo balances demand, rules, and fairness automatically.' },
+    { title: 'Publish and adjust', body: 'Managers tweak exceptions; staff get clear shifts on time.' },
+  ],
+});
+
+const benefits = section({
+  _id: 'ds-benefits',
+  type: 'benefits',
+  heading: 'What changes on the floor',
+  subheading: 'Less admin. More coverage. Happier teams.',
+  items: [
+    { title: '15% more capacity', body: 'Fill gaps with people who are already available and qualified.' },
+    { title: 'Fewer compliance misses', body: 'Rules are checked before a schedule is published.' },
+    { title: 'Managers get time back', body: 'Stop rebuilding rotas from scratch every week.' },
+  ],
+});
+
+const testimonial = section({
+  _id: 'ds-quote',
+  type: 'testimonial',
+  ctaLabel: 'Customer story',
+  heading: 'We stopped rebuilding the rota from scratch every Sunday night.',
+  subheading: 'Operations lead · Multi-site retail',
+});
+
+const caseStudies = section({
+  _id: 'ds-cases',
+  type: 'caseStudies',
+  heading: 'Results in the wild',
+  subheading: 'Sample case cards used across the marketing site.',
+  items: [
+    {
+      title: 'National retail chain',
+      challenge: 'Weekend coverage gaps across 40 stores.',
+      action: 'Rolled out AI drafts with store manager overrides.',
+      result: '12% fewer open shifts within 60 days.',
+    },
+    {
+      title: 'Care provider',
+      challenge: 'Complex rest rules and part-time contracts.',
+      action: 'Encoded compliance into every schedule run.',
+      result: 'Zero rest-rule breaches after go-live.',
+    },
+    {
+      title: 'Logistics hub',
+      challenge: 'Demand swings by hour with no buffer staff.',
+      action: 'Matched qualified floaters to peak windows.',
+      result: 'Same-day fill rate up 18%.',
+    },
+  ],
+});
+
+const richText = section({
+  _id: 'ds-rich',
+  type: 'richText',
+  heading: 'Rich text section',
+  subheading: 'Used for long-form CMS pages.',
+  body: '<p>This block renders CMS rich content. On real pages the body comes from Wix Ricos JSON or seeded HTML.</p>',
+});
+
+const jobList = section({
+  _id: 'ds-jobs',
+  type: 'jobList',
+  heading: 'Open roles',
+  subheading: 'Careers list pattern.',
+  items: [
+    {
+      title: 'Customer Success Manager',
+      body: 'Help European customers roll out Workofo and grow usage.',
+      ctaLabel: 'Apply',
+      ctaUrl: `/${locale}/get-in-touch`,
+    },
+    {
+      title: 'Product Designer',
+      body: 'Shape scheduling UX for managers and frontline staff.',
+      ctaLabel: 'Apply',
+      ctaUrl: `/${locale}/get-in-touch`,
+    },
+  ],
+});
+
+const demoFields = [
+  {
+    target: 'first_name',
+    label: 'First name',
+    placeholder: 'Alex',
+    required: true,
+  },
+  {
+    target: 'email',
+    label: 'Work email',
+    placeholder: 'alex@company.com',
+    required: true,
+    format: 'EMAIL',
+  },
+  {
+    target: 'company',
+    label: 'Company',
+    placeholder: 'Acme Ops',
+    required: true,
+  },
+  {
+    target: 'team_size',
+    label: 'Team size',
+    placeholder: 'Select…',
+    required: true,
+    options: [
+      { value: '1-50', label: '1–50' },
+      { value: '51-200', label: '51–200' },
+      { value: '200+', label: '200+' },
+    ],
+  },
+  {
+    target: 'message',
+    label: 'What are you hoping to solve?',
+    placeholder: 'Tell us a bit about your scheduling today…',
+    viewFieldType: 'TEXT_AREA',
+  },
+];
+
+const colors = [
+  { name: 'Background', varName: '--background', value: '#ececea' },
+  { name: 'Foreground', varName: '--foreground', value: '#111111' },
+  { name: 'Accent', varName: '--accent', value: '#DF5C46' },
+  { name: 'Surface', varName: '--surface', value: '#0a0a0a' },
+  { name: 'Muted', varName: '--muted', value: '#6f6f6f' },
+  { name: 'Muted soft', varName: '--muted-soft', value: '#9a9a9a' },
+  { name: 'Border', varName: '--border', value: '#e4e4e1' },
+  { name: 'Success', varName: '--success', value: '#34d399' },
+  { name: 'Warn', varName: '--warn', value: '#ea1414' },
+];
+
+const radii = [
+  { name: 'sm', varName: '--radius-sm', value: '8px' },
+  { name: 'md', varName: '--radius-md', value: '12px' },
+  { name: 'lg', varName: '--radius-lg', value: '20px' },
+  { name: 'xl', varName: '--radius-xl', value: '28px' },
+  { name: 'full', varName: '--radius-full', value: '999px' },
+];
+---
+
+<SiteLayout
+  locale={locale}
+  title="Design system · Workofo"
+  description="Internal component gallery — not linked from the public site."
+  pathWithoutLang="/design-system"
+  navPages={navPages}
+>
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <div class="ds">
+    <header class="ds__intro shell__inner">
+      <p class="t-overline">Internal</p>
+      <h1 class="t-h2">Design system</h1>
+      <p class="lede" style="margin-left: 0;">
+        All building blocks used on the Workofo site. Not linked from navigation — open via
+        <code>/design-system</code>.
+      </p>
+      <nav class="ds__toc" aria-label="Design system sections">
+        <a href="#foundations">Foundations</a>
+        <a href="#buttons">Buttons</a>
+        <a href="#flags">Flags</a>
+        <a href="#forms">Forms</a>
+        <a href="#blog">Blog card</a>
+        <a href="#hero">Hero</a>
+        <a href="#logo-strip">Logo strip</a>
+        <a href="#problem">Problem</a>
+        <a href="#steps">Steps</a>
+        <a href="#benefits">Benefits</a>
+        <a href="#testimonial">Testimonial</a>
+        <a href="#case-studies">Case studies</a>
+        <a href="#rich-text">Rich text</a>
+        <a href="#job-list">Job list</a>
+        <a href="#demo-form">Demo form</a>
+      </nav>
+    </header>
+
+    <!-- Foundations -->
+    <section class="ds__block shell__inner" id="foundations">
+      <div class="ds__label">
+        <h2>Foundations</h2>
+        <p>Tokens from <code>global.css</code></p>
+      </div>
+
+      <h3 class="ds__sub">Color</h3>
+      <ul class="ds__swatches">
+        {
+          colors.map((c) => (
+            <li>
+              <span class="ds__swatch" style={`background: ${c.value}`} />
+              <strong>{c.name}</strong>
+              <code>{c.varName}</code>
+              <span class="t-caption">{c.value}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="ds__sub">Typography</h3>
+      <div class="ds__type">
+        <p class="t-overline">Overline · Inter 500</p>
+        <h1>Display H1 · Urbanist 600</h1>
+        <h2>Display H2 · Urbanist 600</h2>
+        <h3>Display H3 · Urbanist 600</h3>
+        <p class="lede" style="margin-left: 0;">Lede — supporting sentence under a headline.</p>
+        <p>Body — Inter 400, 16px / 1.55. Used for paragraphs and UI copy.</p>
+        <p class="t-hand">Hand accent · Caveat</p>
+        <p class="t-caption">Caption · mono muted</p>
+        <p class="muted">Muted body text</p>
+      </div>
+
+      <h3 class="ds__sub">Radius</h3>
+      <ul class="ds__radii">
+        {
+          radii.map((r) => (
+            <li>
+              <span class="ds__radius" style={`border-radius: ${r.value}`} />
+              <strong>{r.name}</strong>
+              <code>{r.varName}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- Buttons -->
+    <section class="ds__block shell__inner" id="buttons">
+      <div class="ds__label">
+        <h2>Buttons</h2>
+        <p><code>.btn</code> + variants — shared size for header &amp; hero CTAs</p>
+      </div>
+      <div class="ds__row">
+        <a class="btn btn--primary" href="#">Primary</a>
+        <a class="btn btn--ghost" href="#">Ghost</a>
+        <a class="btn btn--accent" href="#">Accent</a>
+        <a class="btn btn--primary btn--header" href="#">Header primary</a>
+        <a class="btn btn--ghost btn--header" href="#">Header ghost</a>
+        <a class="btn btn--primary btn--cta" href="#">CTA primary</a>
+        <a class="btn btn--ghost btn--cta" href="#">CTA ghost</a>
+        <button class="btn btn--accent" type="button" disabled>Disabled</button>
+      </div>
+    </section>
+
+    <!-- Flags / lang -->
+    <section class="ds__block shell__inner" id="flags">
+      <div class="ds__label">
+        <h2>Flags &amp; language</h2>
+        <p>Circular flags · borderless trigger lives in the site header</p>
+      </div>
+      <div class="ds__row">
+        {
+          LOCALES.map((l) => (
+            <div class="ds__flag">
+              <FlagIcon locale={l} />
+              <span>{LOCALE_NAMES[l]}</span>
+              <code>{l}</code>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Form fields -->
+    <section class="ds__block shell__inner" id="forms">
+      <div class="ds__label">
+        <h2>Form fields</h2>
+        <p>Standalone field styles used by the demo form</p>
+      </div>
+      <div class="ds__form-preview">
+        <label class="field">
+          <span>Text *</span>
+          <input type="text" placeholder="Placeholder" />
+        </label>
+        <label class="field">
+          <span>Select</span>
+          <select>
+            <option>Option A</option>
+            <option>Option B</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Textarea</span>
+          <textarea rows="3" placeholder="Message…"></textarea>
+          <em class="field-error">Example validation message</em>
+        </label>
+      </div>
+    </section>
+
+    <!-- Blog card -->
+    <section class="ds__block shell__inner" id="blog">
+      <div class="ds__label">
+        <h2>Blog card</h2>
+        <p>Pattern from the blog index</p>
+      </div>
+      <div class="blog-list__grid" style="max-width: 380px;">
+        <article class="blog-card">
+          <a href={`/${locale}/blog`}>
+            <div class="blog-card__cover">
+              <img src="/workofo-preview.png?v=3" alt="" />
+            </div>
+            <h2>Sample post title</h2>
+            <p class="blog-card__meta">11 Aug 2026</p>
+            <p>Short excerpt showing how blog cards look in the grid.</p>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section components -->
+    <div class="ds__section-wrap" id="hero">
+      <div class="ds__section-banner shell__inner">
+        <h2>Hero</h2>
+        <code>Blocks.Hero</code>
+      </div>
+      <Hero section={hero} locale={locale} />
+    </div>
+
+    <div class="ds__section-wrap" id="logo-strip">
+      <div class="ds__section-banner shell__inner">
+        <h2>Logo strip + marquee</h2>
+        <code>Blocks.LogoStrip</code>
+      </div>
+      <LogoStrip section={logoStrip} />
+    </div>
+
+    <div class="ds__section-wrap" id="problem">
+      <div class="ds__section-banner shell__inner">
+        <h2>Problem</h2>
+        <code>Blocks.Problem</code>
+      </div>
+      <Problem section={problem} />
+    </div>
+
+    <div class="ds__section-wrap" id="steps">
+      <div class="ds__section-banner shell__inner">
+        <h2>Steps</h2>
+        <code>Blocks.Steps</code>
+      </div>
+      <Steps section={steps} />
+    </div>
+
+    <div class="ds__section-wrap" id="benefits">
+      <div class="ds__section-banner shell__inner">
+        <h2>Benefits</h2>
+        <code>Blocks.Benefits</code>
+      </div>
+      <Benefits section={benefits} />
+    </div>
+
+    <div class="ds__section-wrap" id="testimonial">
+      <div class="ds__section-banner shell__inner">
+        <h2>Testimonial</h2>
+        <code>Blocks.Testimonial</code>
+      </div>
+      <Testimonial section={testimonial} />
+    </div>
+
+    <div class="ds__section-wrap" id="case-studies">
+      <div class="ds__section-banner shell__inner">
+        <h2>Case studies</h2>
+        <code>Blocks.CaseStudies</code>
+      </div>
+      <CaseStudies section={caseStudies} />
+    </div>
+
+    <div class="ds__section-wrap" id="rich-text">
+      <div class="ds__section-banner shell__inner">
+        <h2>Rich text</h2>
+        <code>Blocks.RichText</code>
+      </div>
+      <RichText section={richText} />
+    </div>
+
+    <div class="ds__section-wrap" id="job-list">
+      <div class="ds__section-banner shell__inner">
+        <h2>Job list</h2>
+        <code>Blocks.JobList</code>
+      </div>
+      <JobList section={jobList} />
+    </div>
+
+    <div class="ds__section-wrap" id="demo-form">
+      <div class="ds__section-banner shell__inner">
+        <h2>Demo form</h2>
+        <code>DemoForm</code>
+      </div>
+      <DemoForm
+        client:load
+        heading="Book a demo"
+        subheading="Sample fields — submitting still hits the live form API."
+        fields={demoFields}
+        locale={locale}
+      />
+    </div>
+  </div>
+</SiteLayout>
+
+<style is:global>
+  .ds__intro {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    text-align: left;
+  }
+  .ds__intro .lede {
+    max-width: 40rem;
+  }
+  .ds__intro code,
+  .ds__label code,
+  .ds__section-banner code,
+  .ds__swatches code,
+  .ds__radii code,
+  .ds__flag code {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+  .ds__toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: var(--space-md);
+  }
+  .ds__toc a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .ds__toc a:hover {
+    color: var(--foreground);
+  }
+  .ds__block {
+    padding-block: var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+  .ds__label {
+    margin-bottom: var(--space-lg);
+  }
+  .ds__label h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+  }
+  .ds__label p {
+    margin: 0;
+    color: var(--muted);
+  }
+  .ds__sub {
+    margin: var(--space-lg) 0 var(--space-sm);
+    font-size: 1rem;
+  }
+  .ds__swatches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-sm);
+  }
+  .ds__swatches li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ds__swatch {
+    display: block;
+    height: 72px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+  .ds__swatches strong {
+    font-size: 0.9rem;
+  }
+  .ds__type {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 44rem;
+  }
+  .ds__type > * {
+    margin: 0;
+  }
+  .ds__radii {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+  .ds__radii li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .ds__radius {
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    border: 2px solid var(--foreground);
+  }
+  .ds__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+  .ds__flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .ds__form-preview {
+    display: grid;
+    gap: var(--space-sm);
+    max-width: 28rem;
+  }
+  .ds__section-wrap {
+    border-top: 1px solid var(--border);
+  }
+  .ds__section-banner {
+    padding-block: var(--space-md);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+  .ds__section-banner h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+</style>
