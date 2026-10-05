@@ -79,9 +79,24 @@ const pageTitle =
       : result.status === 'not_found'
         ? ui('pageNotFound', locale)
         : 'CMS setup needed';
+
+/** English homepage SEO — primary keyword cluster without waiting on CMS title edits. */
+const isEnHome = locale === 'en' && slug === 'home';
+const seoTitle = isEnHome
+  ? 'Employee Scheduling Software | AI Workforce Optimization — Workofo'
+  : pageTitle;
+const seoDescription = isEnHome
+  ? 'AI-powered employee scheduling software that forecasts labor demand and automatically creates optimized staff schedules around when and where work happens.'
+  : undefined;
 ---
 
-<SiteLayout locale={locale} title={pageTitle} pathWithoutLang={`/${slug}`} navPages={navPages}>
+<SiteLayout
+  locale={locale}
+  title={seoTitle}
+  description={seoDescription}
+  pathWithoutLang={`/${slug}`}
+  navPages={navPages}
+>
   {
     result.status === 'ok' && (
       <SectionRenderer

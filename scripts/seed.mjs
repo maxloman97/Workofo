@@ -155,7 +155,13 @@ for (const col of [SITE_SECTIONS, SITE_PAGES]) {
 
 const pageDefs = [
   // EN
-  { title: 'Workofo — AI workforce scheduling', slug: 'home', language: 'en', navLabel: 'Home', navOrder: 0 },
+  {
+    title: 'Employee Scheduling Software | AI Workforce Optimization — Workofo',
+    slug: 'home',
+    language: 'en',
+    navLabel: 'Home',
+    navOrder: 0,
+  },
   { title: 'Book a Demo', slug: 'get-in-touch', language: 'en', navLabel: 'Contact', navOrder: 2 },
   { title: 'Jobs', slug: 'jobs', language: 'en', navLabel: 'Jobs', navOrder: 1 },
   // LT
@@ -394,12 +400,12 @@ const jobsLt = JSON.stringify([
 const sections = [
   // EN home
   section('en', 'home', 1, 'hero', {
-    heading: 'Unlock 15% more workforce capacity with AI scheduling.',
+    heading: 'AI-powered employee scheduling software built around real demand',
     subheading:
-      'Forecast demand and workload and optimize schedules automatically, so teams are staffed when and where work actually happens.',
-    ctaLabel: 'See how it works',
+      'Forecast demand, apply real-world labor rules and automatically create optimized schedules around when and where work actually happens.',
+    ctaLabel: 'Book a demo',
     ctaUrl: '/en/get-in-touch',
-    body: 'Used by retail, hospitality, and service businesses across Europe.',
+    body: 'Unlock 5–15% more effective capacity',
   }),
   section('en', 'home', 2, 'logoStrip', {
     heading: 'Some of our clients',

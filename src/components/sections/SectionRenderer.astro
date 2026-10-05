@@ -13,6 +13,10 @@ import {
   Steps,
   Testimonial,
 } from './Blocks';
+import CapacityCalculator from './CapacityCalculator';
+import HowItWorks from './HowItWorks';
+import { HomeFaq, HomeIndustries, HomeProof } from './HomeJourney';
+import { parseItemsJson } from '../../lib/rich';
 import DemoForm from './DemoForm';
 
 type FormField = {
@@ -49,6 +53,13 @@ const {
 } = Astro.props as Props;
 
 const SIMPLE_HERO_SLUGS = new Set(['jobs', 'get-in-touch']);
+const showCapacityCalc = locale === 'en' && pageSlug === 'home';
+const stepsSection = showCapacityCalc ? sections.find((s) => (s.type || '').trim() === 'steps') : undefined;
+const howItWorksSteps = stepsSection
+  ? parseItemsJson<{ title?: string; body?: string }>(stepsSection.items)
+      .filter((item) => item.title)
+      .map((item) => ({ title: item.title as string, body: item.body }))
+  : [];
 
 const SUPPORTED =
   'hero, logoStrip, problem, steps, benefits, testimonial, caseStudies, demoForm, richText, jobList';
@@ -64,7 +75,29 @@ const SUPPORTED =
         }
         return <Hero section={section} locale={locale} />;
       case 'logoStrip':
-        return <LogoStrip section={section} />;
+        return (
+          <>
+            <LogoStrip section={section} locale={locale} />
+            {showCapacityCalc && (
+              <CapacityCalculator client:load demoHref={`/${locale}/get-in-touch`} />
+            )}
+            {showCapacityCalc && howItWorksSteps.length > 0 && (
+              <HowItWorks
+                client:visible
+                steps={howItWorksSteps}
+                note={stepsSection?.ctaLabel}
+                demoHref={`/${locale}/get-in-touch`}
+              />
+            )}
+            {showCapacityCalc && (
+              <>
+                <HomeIndustries locale={locale} />
+                <HomeProof />
+                <HomeFaq locale={locale} />
+              </>
+            )}
+          </>
+        );
       case 'problem':
         return <Problem section={section} />;
       case 'steps':

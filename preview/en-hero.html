@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Workofo EN Hero Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Urbanist:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./en-hero.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="#">Workofo</a>
+        <nav class="site-nav">
+          <a href="#">Solutions</a>
+          <a href="#">Jobs</a>
+          <a href="#">Contact</a>
+        </nav>
+        <a class="btn btn--primary btn--header" href="#demo">Book a demo</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero hero--enterprise">
+        <div class="hero__inner">
+          <div class="hero__stack">
+            <div class="hero__copy">
+              <p class="t-overline hero__eyebrow">AI-powered workforce optimization</p>
+              <h1>AI-powered employee scheduling software built around real demand</h1>
+              <p class="lede">
+                Forecast demand, apply real-world labor rules and automatically create optimized
+                schedules around when and where work actually happens.
+              </p>
+              <div class="hero__actions">
+                <a class="btn btn--primary btn--cta" href="#demo">Book a demo</a>
+                <a class="btn btn--ghost btn--cta" href="#calculate-potential">Calculate your potential</a>
+              </div>
+              <p class="hero__trust">
+                Trusted by retail, hospitality, and contact-center teams across Europe
+              </p>
+            </div>
+
+            <aside class="hero-visual" aria-label="Demand forecast aligned with optimized employee schedule">
+              <div class="hero-visual__frame">
+                <header class="hero-visual__header">
+                  <div class="hero-visual__title-block">
+                    <p class="hero-visual__kicker">Today · Store network</p>
+                    <h2 class="hero-visual__title">Demand vs. coverage</h2>
+                  </div>
+                  <div class="hero-visual__kpi">
+                    <span class="hero-visual__kpi-value">94%</span>
+                    <span class="hero-visual__kpi-label">Peak coverage</span>
+                  </div>
+                </header>
+
+                <div class="hero-visual__chart-wrap">
+                  <svg
+                    class="hero-visual__chart"
+                    viewBox="0 0 520 168"
+                    role="img"
+                    aria-label="Chart comparing forecasted labor demand with scheduled staffing coverage"
+                  >
+                    <defs>
+                      <linearGradient id="heroDemandFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#1a6b4a" stop-opacity="0.22" />
+                        <stop offset="100%" stop-color="#1a6b4a" stop-opacity="0.02" />
+                      </linearGradient>
+                    </defs>
+                    <line x1="8" x2="512" y1="52" y2="52" class="hero-visual__grid" />
+                    <line x1="8" x2="512" y1="88" y2="88" class="hero-visual__grid" />
+                    <line x1="8" x2="512" y1="124" y2="124" class="hero-visual__grid" />
+                    <path
+                      d="M 8.0 111.0 L 53.8 105.8 L 99.6 84.6 L 145.5 52.8 L 191.3 31.6 L 237.1 44.8 L 282.9 55.4 L 328.7 39.5 L 374.5 23.6 L 420.4 34.2 L 466.2 71.4 L 512.0 100.5 L 512.0 152.0 L 8.0 152.0 Z"
+                      fill="url(#heroDemandFill)"
+                    />
+                    <path
+                      class="hero-visual__demand-line"
+                      fill="none"
+                      d="M 8.0 111.0 L 53.8 105.8 L 99.6 84.6 L 145.5 52.8 L 191.3 31.6 L 237.1 44.8 L 282.9 55.4 L 328.7 39.5 L 374.5 23.6 L 420.4 34.2 L 466.2 71.4 L 512.0 100.5"
+                    />
+                    <path
+                      class="hero-visual__staff-line"
+                      fill="none"
+                      d="M 8.0 108.4 L 53.8 103.1 L 99.6 82.0 L 145.5 55.4 L 191.3 34.2 L 237.1 42.2 L 282.9 52.8 L 328.7 36.9 L 374.5 26.2 L 420.4 36.9 L 466.2 68.8 L 512.0 97.8"
+                    />
+                    <circle cx="374.5" cy="23.6" r="4.5" class="hero-visual__peak" />
+                  </svg>
+                  <div class="hero-visual__legend" aria-hidden="true">
+                    <span class="hero-visual__legend-item hero-visual__legend-item--demand">Labor demand</span>
+                    <span class="hero-visual__legend-item hero-visual__legend-item--staff">Staff coverage</span>
+                  </div>
+                  <div class="hero-visual__hours" aria-hidden="true">
+                    <span>6:00</span><span>10:00</span><span>14:00</span><span>18:00</span><span>22:00</span><span>2:00</span>
+                  </div>
+                </div>
+
+                <div class="hero-visual__schedule">
+                  <div class="hero-visual__schedule-head">
+                    <p class="hero-visual__schedule-label">Optimized shifts</p>
+                    <p class="hero-visual__schedule-meta">Built around forecast peaks</p>
+                  </div>
+                  <div class="hero-visual__lanes">
+                    <div class="hero-visual__lane">
+                      <span class="hero-visual__role">Floor</span>
+                      <div class="hero-visual__track">
+                        <span class="hero-visual__block hero-visual__block--0" style="left:8%;width:22%"></span>
+                        <span class="hero-visual__block hero-visual__block--0" style="left:28%;width:26%"></span>
+                        <span class="hero-visual__block hero-visual__block--0" style="left:52%;width:28%"></span>
+                      </div>
+                    </div>
+                    <div class="hero-visual__lane">
+                      <span class="hero-visual__role">Support</span>
+                      <div class="hero-visual__track">
+                        <span class="hero-visual__block hero-visual__block--1" style="left:18%;width:20%"></span>
+                        <span class="hero-visual__block hero-visual__block--1" style="left:42%;width:24%"></span>
+                        <span class="hero-visual__block hero-visual__block--1" style="left:68%;width:18%"></span>
+                      </div>
+                    </div>
+                    <div class="hero-visual__lane">
+                      <span class="hero-visual__role">Lead</span>
+                      <div class="hero-visual__track">
+                        <span class="hero-visual__block hero-visual__block--2" style="left:12%;width:30%"></span>
+                        <span class="hero-visual__block hero-visual__block--2" style="left:48%;width:32%"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="calculate-potential" class="calc-placeholder">
+        <div class="hero__inner">
+          <p class="t-overline">Coming next</p>
+          <h2>Calculate your potential</h2>
+          <p class="lede">Anchor reserved for the future calculator section.</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -59,8 +59,13 @@ export const UI = {
   },
   heroEyebrow: {
     lt: 'AI darbo jėgos planavimas',
-    en: 'AI workforce scheduling',
+    en: 'Unlock 5–15% more capacity',
     se: 'AI-schemaläggning för personal',
+  },
+  calculatePotential: {
+    lt: 'Apskaičiuokite potencialą',
+    en: 'Calculate your potential',
+    se: 'Beräkna din potential',
   },
   footerCopy: {
     lt: 'Turinys valdomas Wix CMS.',
