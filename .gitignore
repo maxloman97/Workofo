@@ -28,3 +28,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# nested clone metadata
+.git.bak/
+.git/

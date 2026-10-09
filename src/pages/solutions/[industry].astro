@@ -1,0 +1,11 @@
+---
+/** Legacy EN `/solutions/{slug}` → `/industries/{slug}`. */
+import { isIndustrySlug } from '../../lib/solutions';
+import { industryPath } from '../../lib/paths';
+
+const industry = Astro.params.industry;
+if (!isIndustrySlug(industry)) {
+  return Astro.redirect('/industries/retail', 302);
+}
+return Astro.redirect(industryPath('en', industry), 301);
+---

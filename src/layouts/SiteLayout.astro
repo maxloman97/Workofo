@@ -1,7 +1,8 @@
 ---
 import { LOCALES, LOCALE_LABELS, LOCALE_NAMES, htmlLang, ui, type Locale } from '../lib/locales';
 import { LOGIN_URL, SITE_NAME } from '../lib/config';
-import { listIndustrySolutions } from '../lib/solutions';
+import { isIndustrySlug, listIndustrySolutions, type IndustrySlug } from '../lib/solutions';
+import { localePath, industryPath, normalizePath } from '../lib/paths';
 import FlagIcon from '../components/FlagIcon.astro';
 import '../styles/global.css';
 
@@ -18,17 +19,33 @@ type Props = {
 const { locale, title, description, pathWithoutLang = '', navPages = [] } = Astro.props;
 const lang = htmlLang(locale);
 const origin = Astro.url.origin;
-const currentPath = pathWithoutLang.startsWith('/') ? pathWithoutLang : `/${pathWithoutLang}`;
+const currentPath = normalizePath(pathWithoutLang);
 
 const nav = [...navPages]
   .filter((p) => p.slug && p.slug !== 'home')
   .sort((a, b) => (a.navOrder ?? 99) - (b.navOrder ?? 99));
 
 const solutions = listIndustrySolutions().map((item) => ({
-  slug: item.slug,
+  slug: item.slug as IndustrySlug,
   label: item.navLabel[locale] ?? item.navLabel.en,
+  href: industryPath(locale, item.slug),
 }));
-const isSolutionsActive = currentPath.startsWith('/solutions/');
+
+const isIndustryPage = currentPath.startsWith('/industries/');
+const isSolutionsActive = isIndustryPage;
+
+function alternateHref(targetLocale: Locale): string {
+  if (isIndustryPage) {
+    const slug = currentPath.slice('/industries/'.length);
+    if (isIndustrySlug(slug)) {
+      return `${origin}${industryPath(targetLocale, slug)}`;
+    }
+  }
+  if (currentPath === '/' || currentPath === '/home') {
+    return `${origin}${localePath(targetLocale, '/')}`;
+  }
+  return `${origin}${localePath(targetLocale, currentPath)}`;
+}
 ---
 
 <!doctype html>
@@ -42,21 +59,17 @@ const isSolutionsActive = currentPath.startsWith('/solutions/');
     <slot name="seo-tags" />
     {
       LOCALES.map((l) => (
-        <link
-          rel="alternate"
-          hreflang={htmlLang(l)}
-          href={`${origin}/${l}${currentPath === '/' ? '' : currentPath}`}
-        />
+        <link rel="alternate" hreflang={htmlLang(l)} href={alternateHref(l)} />
       ))
     }
-    <link rel="alternate" hreflang="x-default" href={`${origin}/en${currentPath === '/' ? '/home' : currentPath}`} />
+    <link rel="alternate" hreflang="x-default" href={alternateHref('en')} />
     <slot name="head" />
   </head>
   <body>
     <a class="skip" href="#main">{ui('skip', locale)}</a>
     <header class="site-header" data-site-header>
       <div class="site-header__inner">
-        <a class="brand" href={`/${locale}/home`}>
+        <a class="brand" href={localePath(locale, '/')}>
           <img
             src="/workofo-logo.png?v=5"
             alt={SITE_NAME}
@@ -77,10 +90,12 @@ const isSolutionsActive = currentPath.startsWith('/solutions/');
               {
                 solutions.map((item) => (
                   <a
-                    href={`/${locale}/solutions/${item.slug}`}
+                    href={item.href}
                     class:list={[
                       'nav-dropdown__option',
-                      { 'is-active': currentPath === `/solutions/${item.slug}` },
+                      {
+                        'is-active': currentPath === `/industries/${item.slug}`,
+                      },
                     ]}
                   >
                     {item.label}
@@ -91,10 +106,10 @@ const isSolutionsActive = currentPath.startsWith('/solutions/');
           </details>
           {
             nav.map((p) => (
-              <a href={`/${locale}/${p.slug}`}>{p.navLabel || p.title || p.slug}</a>
+              <a href={localePath(locale, `/${p.slug}`)}>{p.navLabel || p.title || p.slug}</a>
             ))
           }
-          <a href={`/${locale}/blog`}>{ui('blog', locale)}</a>
+          <a href={localePath(locale, '/blog')}>{ui('blog', locale)}</a>
         </nav>
         <div class="header-actions">
           <details class="lang-dropdown">
@@ -109,7 +124,7 @@ const isSolutionsActive = currentPath.startsWith('/solutions/');
               {
                 LOCALES.map((l) => (
                   <a
-                    href={`/${l}${currentPath === '/' ? '/home' : currentPath}`}
+                    href={alternateHref(l).replace(origin, '') || '/'}
                     class:list={['lang-dropdown__option', { 'is-active': l === locale }]}
                     hreflang={htmlLang(l)}
                     role="option"
@@ -125,7 +140,9 @@ const isSolutionsActive = currentPath.startsWith('/solutions/');
           <a class="btn btn--ghost btn--header" href={LOGIN_URL} target="_blank" rel="noreferrer noopener">
             {ui('login', locale)}
           </a>
-          <a class="btn btn--primary btn--header" href={`/${locale}/get-in-touch`}>{ui('bookDemo', locale)}</a>
+          <a class="btn btn--primary btn--header" href={localePath(locale, '/get-in-touch')}>
+            {ui('bookDemo', locale)}
+          </a>
         </div>
       </div>
     </header>

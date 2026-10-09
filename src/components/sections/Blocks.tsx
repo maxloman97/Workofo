@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
 import type { CmsSection } from '../../lib/cms';
 import { WATCH_VIDEO_URL } from '../../lib/config';
-import { ui, type Locale } from '../../lib/locales';
+import { isModernHomeLocale, ui, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
 import { imgSrc, parseItemsJson, richToHtml } from '../../lib/rich';
 
 type Props = { section: CmsSection; locale?: Locale };
@@ -22,32 +23,49 @@ const CLIENT_LOGOS = [
   { name: 'Planas Chuliganas', image: '/clients/planas-chuliganas.png?v=2' },
 ];
 
-/** English homepage hero — SEO + conversion copy (CMS can still supply CTA URL). */
-const EN_HOME_HERO = {
-  eyebrow: 'Unlock 5–15% more capacity',
+/** Modern homepage hero — EN SEO copy used as placeholder for SE until rewritten. */
+const MODERN_HOME_HERO = {
+  eyebrow: 'AI-powered workforce scheduling',
   heading: 'AI-powered employee scheduling software built around real demand',
-  body: 'Forecast demand, apply real-world labor rules and automatically create optimized schedules around when and where work actually happens.',
+  body: 'Forecast staffing demand, apply real-world labor rules and automatically create optimized employee schedules around when and where work actually happens.',
   primaryCta: 'Book a demo',
   secondaryCta: 'Calculate your potential',
 } as const;
 
 export function Hero({ section, locale = 'en' }: Props) {
-  const demoHref = section.ctaUrl || `/${locale}/get-in-touch`;
-  const isEnHome = locale === 'en';
-  const eyebrow = isEnHome ? EN_HOME_HERO.eyebrow : ui('heroEyebrow', locale);
-  const heading = isEnHome ? EN_HOME_HERO.heading : section.heading;
-  const body = isEnHome ? EN_HOME_HERO.body : section.subheading;
-  const primaryCta = isEnHome ? EN_HOME_HERO.primaryCta : ui('bookDemo', locale);
-  const secondaryHref = isEnHome ? '#calculate-potential' : WATCH_VIDEO_URL;
-  const secondaryCta = isEnHome ? EN_HOME_HERO.secondaryCta : ui('watchVideo', locale);
+  const modern = isModernHomeLocale(locale);
+  // Modern home always uses the locale demo path; CMS may still hold an older /en/... CTA.
+  const demoHref = modern
+    ? localePath(locale, '/get-in-touch')
+    : section.ctaUrl && !section.ctaUrl.startsWith('/en/')
+      ? section.ctaUrl
+      : localePath(locale, '/get-in-touch');
+  const eyebrow = modern
+    ? locale === 'se'
+      ? ui('heroEyebrow', locale)
+      : MODERN_HOME_HERO.eyebrow
+    : ui('heroEyebrow', locale);
+  const heading = modern ? MODERN_HOME_HERO.heading : section.heading;
+  const body = modern ? MODERN_HOME_HERO.body : section.subheading;
+  const primaryCta = modern
+    ? locale === 'se'
+      ? ui('bookDemo', locale)
+      : MODERN_HOME_HERO.primaryCta
+    : ui('bookDemo', locale);
+  const secondaryHref = modern ? '#calculate-potential' : WATCH_VIDEO_URL;
+  const secondaryCta = modern
+    ? locale === 'se'
+      ? ui('calculatePotential', locale)
+      : MODERN_HOME_HERO.secondaryCta
+    : ui('watchVideo', locale);
 
   return (
-    <section className={`hero${isEnHome ? ' hero--en' : ''}`}>
+    <section className={`hero${modern ? ' hero--en' : ''}`}>
       <div className="hero__inner">
         <div className="hero__stack">
           <div className="hero__copy">
             <p className="t-overline hero__eyebrow">
-              {isEnHome && <span className="hero__eyebrow-dot" aria-hidden="true" />}
+              {modern && <span className="hero__eyebrow-dot" aria-hidden="true" />}
               {eyebrow}
             </p>
             {heading && <h1 data-split>{heading}</h1>}
@@ -59,17 +77,17 @@ export function Hero({ section, locale = 'en' }: Props) {
               <a
                 className="btn btn--ghost btn--cta"
                 href={secondaryHref}
-                {...(isEnHome
+                {...(modern
                   ? {}
                   : { target: '_blank', rel: 'noreferrer noopener' })}
               >
-                {!isEnHome && (
+                {!modern && (
                   <svg className="btn__icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
                     <path d="M3.2 1.6v10.8L12.2 7 3.2 1.6z" fill="currentColor" />
                   </svg>
                 )}
                 {secondaryCta}
-                {isEnHome && (
+                {modern && (
                   <svg className="btn__icon btn__icon--trail btn__icon--down" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
                     <path d="M7 2.5v9M3.5 8 7 11.5 10.5 8" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -134,10 +152,9 @@ export function LogoStrip({ section, locale = 'en' }: Props) {
     }))
     .filter((item) => item.src);
 
-  const label =
-    locale === 'en'
-      ? 'Trusted by teams across Europe'
-      : section.heading || section.subheading || '';
+  const label = isModernHomeLocale(locale)
+    ? 'Trusted by teams across Europe'
+    : section.heading || section.subheading || '';
 
   if (!logos.length && !label) return null;
 
@@ -246,7 +263,10 @@ export function Steps({ section }: Props) {
 
 export function Benefits({ section, locale = 'en' }: Props) {
   const items = parseItemsJson<{ title?: string; body?: string }>(section.items).slice(0, 4);
-  const demoHref = section.ctaUrl || `/${locale}/get-in-touch`;
+  const demoHref =
+    section.ctaUrl && !section.ctaUrl.startsWith('/en/')
+      ? section.ctaUrl
+      : localePath(locale, '/get-in-touch');
   const ctaLabel = section.ctaLabel || ui('bookDemo', locale);
   const count = Math.max(items.length, 1);
 

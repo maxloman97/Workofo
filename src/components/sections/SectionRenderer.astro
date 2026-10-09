@@ -1,6 +1,7 @@
 ---
 import type { CmsSection } from '../../lib/cms';
-import type { Locale } from '../../lib/locales';
+import { isModernHomeLocale, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
 import {
   Benefits,
   CaseStudies,
@@ -14,9 +15,10 @@ import {
   Testimonial,
 } from './Blocks';
 import CapacityCalculator from './CapacityCalculator';
-import HowItWorks from './HowItWorks';
-import { HomeFaq, HomeIndustries, HomeProof } from './HomeJourney';
-import { parseItemsJson } from '../../lib/rich';
+import ArlandaCase from './ArlandaCase';
+import HomeFeatures from './HomeFeatures';
+import HomeFeatureAnnounce from './HomeFeatureAnnounce';
+import { HomeFaq, HomeIndustries } from './HomeJourney';
 import DemoForm from './DemoForm';
 
 type FormField = {
@@ -53,21 +55,48 @@ const {
 } = Astro.props as Props;
 
 const SIMPLE_HERO_SLUGS = new Set(['jobs', 'get-in-touch']);
-const showCapacityCalc = locale === 'en' && pageSlug === 'home';
-const stepsSection = showCapacityCalc ? sections.find((s) => (s.type || '').trim() === 'steps') : undefined;
-const howItWorksSteps = stepsSection
-  ? parseItemsJson<{ title?: string; body?: string }>(stepsSection.items)
-      .filter((item) => item.title)
-      .map((item) => ({ title: item.title as string, body: item.body }))
-  : [];
+const useModernHome = isModernHomeLocale(locale) && pageSlug === 'home';
+const heroSection = sections.find((s) => (s.type || '').trim() === 'hero');
+const logoSection = sections.find((s) => (s.type || '').trim() === 'logoStrip');
 
 const SUPPORTED =
   'hero, logoStrip, problem, steps, benefits, testimonial, caseStudies, demoForm, richText, jobList';
 ---
 
 {
+  useModernHome && heroSection && (
+    <div class="home-top-band">
+      <Hero section={heroSection} locale={locale} />
+      {logoSection && <LogoStrip section={logoSection} locale={locale} />}
+    </div>
+  )
+}
+{
+  useModernHome && logoSection && (
+    <>
+      <HomeFeatures />
+      <CapacityCalculator client:load demoHref={localePath(locale, '/get-in-touch')} />
+      <ArlandaCase client:load />
+      <HomeFeatureAnnounce demoHref={localePath(locale, '/get-in-touch')} />
+      <HomeIndustries client:load locale={locale} />
+      <HomeFaq locale={locale} />
+    </>
+  )
+}
+{
   sections.map((section) => {
     const type = (section.type || '').trim();
+    // Modern home (EN/SE): custom stack above; skip CMS problem / benefits / testimonial too.
+    if (
+      useModernHome &&
+      (type === 'hero' ||
+        type === 'logoStrip' ||
+        type === 'problem' ||
+        type === 'benefits' ||
+        type === 'testimonial')
+    ) {
+      return null;
+    }
     switch (type) {
       case 'hero':
         if (SIMPLE_HERO_SLUGS.has(pageSlug) && pageLabel) {
@@ -75,32 +104,12 @@ const SUPPORTED =
         }
         return <Hero section={section} locale={locale} />;
       case 'logoStrip':
-        return (
-          <>
-            <LogoStrip section={section} locale={locale} />
-            {showCapacityCalc && (
-              <CapacityCalculator client:load demoHref={`/${locale}/get-in-touch`} />
-            )}
-            {showCapacityCalc && howItWorksSteps.length > 0 && (
-              <HowItWorks
-                client:visible
-                steps={howItWorksSteps}
-                note={stepsSection?.ctaLabel}
-                demoHref={`/${locale}/get-in-touch`}
-              />
-            )}
-            {showCapacityCalc && (
-              <>
-                <HomeIndustries locale={locale} />
-                <HomeProof />
-                <HomeFaq locale={locale} />
-              </>
-            )}
-          </>
-        );
+        return <LogoStrip section={section} locale={locale} />;
       case 'problem':
         return <Problem section={section} />;
       case 'steps':
+        // Modern home already surfaces these four steps in section 2 — skip the duplicate block.
+        if (useModernHome) return null;
         return <Steps section={section} />;
       case 'benefits':
         return <Benefits section={section} locale={locale} />;

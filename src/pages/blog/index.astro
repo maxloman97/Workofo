@@ -1,20 +1,11 @@
 ---
-import SiteLayout from '../../../layouts/SiteLayout.astro';
-import { isLocale, ui, type Locale } from '../../../lib/locales';
-import { listBlogPosts, formatPostDate } from '../../../lib/blog';
-import { listNavPages } from '../../../lib/cms';
-import { localePath } from '../../../lib/paths';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { ui } from '../../lib/locales';
+import { listBlogPosts, formatPostDate } from '../../lib/blog';
+import { listNavPages } from '../../lib/cms';
+import { localePath } from '../../lib/paths';
 
-const rawLang = Astro.params.lang;
-if (!isLocale(rawLang)) {
-  return Astro.redirect('/blog', 302);
-}
-const locale = rawLang as Locale;
-
-if (locale === 'en') {
-  return Astro.redirect('/blog', 301);
-}
-
+const locale = 'en' as const;
 const { posts: blogPosts, error } = await listBlogPosts();
 const navPages = await listNavPages(locale);
 ---

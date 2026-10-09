@@ -1,5 +1,7 @@
 ---
-import { DEFAULT_LOCALE } from '../lib/locales';
-// English is the site default — send `/` straight to the EN home page.
-return Astro.redirect(`/${DEFAULT_LOCALE}/home`, 301);
+/**
+ * English (default locale) homepage — unprefixed `/`.
+ */
+import CmsPage from '../components/CmsPage.astro';
 ---
+<CmsPage locale="en" slug="home" />

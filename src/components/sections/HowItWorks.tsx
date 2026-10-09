@@ -21,7 +21,7 @@ function visualFor(title: string, i: number) {
   return VISUALS.find((v) => v.test.test(title)) ?? VISUALS[i % VISUALS.length];
 }
 
-export default function HowItWorks({ steps, note, demoHref = '/en/get-in-touch' }: Props) {
+export default function HowItWorks({ steps, note, demoHref = '/get-in-touch' }: Props) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
@@ -48,8 +48,9 @@ export default function HowItWorks({ steps, note, demoHref = '/en/get-in-touch' 
 
   if (!steps.length) return null;
 
-  const [noteLead, ...noteParts] = (note ?? '').split(/\s+—\s+/);
-  const noteRest = noteParts.join(' — ');
+  // Prefer colon/period; still split legacy CMS notes that used an em dash.
+  const [noteLead, ...noteParts] = (note ?? '').split(/\s+(?:—|:)\s+/);
+  const noteRest = noteParts.join(' ');
 
   return (
     <section
@@ -151,7 +152,7 @@ export default function HowItWorks({ steps, note, demoHref = '/en/get-in-touch' 
               </span>
               <span className="how-it-works__note-text">
                 {noteLead && <strong>{noteLead}</strong>}
-                {noteRest && <span>{noteLead ? ` — ${noteRest}` : noteRest}</span>}
+                {noteRest && <span>{noteLead ? `. ${noteRest}` : noteRest}</span>}
               </span>
             </p>
           )}

@@ -19,6 +19,11 @@ export function isLocale(value: string | undefined): value is Locale {
   return !!value && (LOCALES as readonly string[]).includes(value);
 }
 
+/** Locales that use the redesigned homepage stack (custom React sections, not CMS problem/benefits/testimonial). */
+export function isModernHomeLocale(locale: Locale): boolean {
+  return locale === 'en' || locale === 'se';
+}
+
 export function htmlLang(locale: Locale): string {
   // Swedish uses ISO 639-1 "sv"; we keep URL segment as "se" per product brief.
   if (locale === 'se') return 'sv';
@@ -99,8 +104,8 @@ export const UI = {
   },
   blogIntro: {
     lt: 'Naujienos iš Workofo komandos — redaguojama Wix Blog.',
-    en: 'Updates from the Workofo team — managed in the Wix Blog editor.',
-    se: 'Uppdateringar från Workofo-teamet — hanteras i Wix Blog.',
+    en: 'Updates from the Workofo team, managed in the Wix Blog editor.',
+    se: 'Uppdateringar från Workofo-teamet, hanteras i Wix Blog.',
   },
   blogEmpty: {
     lt: 'Dar nėra paskelbtų įrašų.',
@@ -114,8 +119,8 @@ export const UI = {
   },
   formSuccess: {
     lt: 'Ačiū — gavome užklausą ir greitai susisieksime.',
-    en: 'Thanks — we received your request and will be in touch shortly.',
-    se: 'Tack — vi har mottagit din förfrågan och återkommer snart.',
+    en: 'Thanks. We received your request and will be in touch shortly.',
+    se: 'Tack. Vi har mottagit din förfrågan och återkommer snart.',
   },
   formFail: {
     lt: 'Nepavyko išsiųsti. Bandykite dar kartą.',

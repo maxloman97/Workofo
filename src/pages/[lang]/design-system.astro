@@ -3,11 +3,11 @@
  * Locale-prefixed alias → canonical internal gallery.
  * Keeps the header language switcher from hitting the CMS 404 route.
  */
-import { isLocale, DEFAULT_LOCALE } from '../../lib/locales';
+import { isLocale } from '../../lib/locales';
 
 const rawLang = Astro.params.lang;
 if (!isLocale(rawLang)) {
-  return Astro.redirect(`/${DEFAULT_LOCALE}/home`, 302);
+  return Astro.redirect('/', 302);
 }
 
 return Astro.redirect('/design-system', 302);

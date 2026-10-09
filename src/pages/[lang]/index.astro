@@ -1,9 +1,11 @@
 ---
-import { isLocale, DEFAULT_LOCALE } from '../../lib/locales';
+import { isLocale, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
 
 const raw = Astro.params.lang;
 if (!isLocale(raw)) {
-  return Astro.redirect(`/${DEFAULT_LOCALE}/home`, 301);
+  return Astro.redirect('/', 301);
 }
-return Astro.redirect(`/${raw}/home`, 301);
+const locale = raw as Locale;
+return Astro.redirect(localePath(locale, '/'), 301);
 ---

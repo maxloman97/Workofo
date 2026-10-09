@@ -56,18 +56,21 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
   {
     slug: 'retail',
     navLabel: loc('Retail', 'Mažmena'),
-    metaTitle: loc('Retail workforce scheduling | Workofo', 'Mažmenos darbo jėgos planavimas | Workofo'),
+    metaTitle: loc(
+      'Retail Scheduling Software | AI Workforce Scheduling | Workofo',
+      'Mažmenos darbo jėgos planavimas | Workofo',
+    ),
     metaDescription: loc(
-      'AI-powered retail scheduling that aligns staff with traffic, sales, and compliance across stores.',
+      'AI-powered retail scheduling that puts the right people on the floor from morning delivery to evening rush, across every store.',
       'AI mažmenos grafikai, derinantys personalą su srautu, pardavimais ir atitiktimi visose parduotuvėse.',
     ),
-    eyebrow: loc('Retail', 'Mažmena'),
+    eyebrow: loc('Workforce scheduling for retail', 'Mažmena'),
     headline: loc(
-      'Retail scheduling that protects margin and service',
+      'Better staffing. Stronger stores.',
       'Mažmenos grafikai, saugantys maržą ir aptarnavimą',
     ),
     lede: loc(
-      'Workofo helps retailers match labour to demand across stores, departments, and fulfilment — with built-in compliance and 15-minute scheduling accuracy.',
+      'From the morning delivery to the evening rush, put the right people on the floor when your stores need them.',
       'Workofo padeda mažmenininkams suderinti darbo jėgą su paklausa parduotuvėse, skyriuose ir užsakymų vykdyme — su įmontuota atitiktimi ir 15 min. tikslumu.',
     ),
     stats: [
@@ -235,7 +238,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
       'Sandėlio grafikai pralaidumui ir saugai',
     ),
     lede: loc(
-      'Match pickers, packers, and yard teams to inbound waves and outbound cut-offs — with skills, certifications, and labour rules built in.',
+      'Match pickers, packers, and yard teams to inbound waves and outbound cut-offs, with skills, certifications, and labour rules built in.',
       'Derinkite rinkėjus, pakuotojus ir kiemo komandas su įeinančiomis bangomis ir išvykimo terminais — su įgūdžiais, sertifikatais ir darbo taisyklėmis.',
     ),
     stats: [
@@ -310,7 +313,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
       },
       {
         title: loc('Forecast labour to volume', 'Prognozuokite darbo jėgą pagal apimtį'),
-        intro: loc('AI learns your facility rhythms — promotions, weather, and carrier cut-offs.', 'AI mokosi jūsų objekto ritmų — akcijų, oro ir vežėjų terminų.'),
+        intro: loc('AI learns your facility rhythms: promotions, weather, and carrier cut-offs.', 'AI mokosi jūsų objekto ritmų — akcijų, oro ir vežėjų terminų.'),
         points: loc(
           ['Plan headcount to expected lines and pallets.', 'Reduce agency spend with better core scheduling.', 'Align temps with certified shift gaps only.'],
           ['Planuokite personalą pagal numatomas eilutes ir padėklus.', 'Mažinkite agentūrų išlaidas geresniais pagrindiniais grafikais.', 'Derinkite laikiną personalą tik su sertifikuotomis spragomis.'],
@@ -325,7 +328,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
     navLabel: loc('Hospitality & QSRs', 'Svetingumas ir greitas maistas'),
     metaTitle: loc('Hospitality & QSR scheduling | Workofo', 'Svetingumo ir QSR grafikai | Workofo'),
     metaDescription: loc(
-      'Schedule restaurants, hotels, and QSR teams to demand — from rushes to events.',
+      'Schedule restaurants, hotels, and QSR teams to demand, from rushes to events.',
       'Planuokite restoranų, viešbučių ir QSR komandas pagal paklausą — nuo piko iki renginių.',
     ),
     eyebrow: loc('Hospitality & QSRs', 'Svetingumas ir QSR'),
@@ -334,7 +337,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
       'Svetingumo grafikai kiekvienam pikui ir svečiui',
     ),
     lede: loc(
-      'From breakfast rushes to late-night service, Workofo aligns FOH, BOH, and events staff with real demand — while keeping labour rules and preferences fair.',
+      'From breakfast rushes to late-night service, Workofo aligns FOH, BOH, and events staff with real demand, while keeping labour rules and preferences fair.',
       'Nuo pusryčių piko iki vėlyvo aptarnavimo — Workofo derina salės, virtuvės ir renginių personalą su realia paklausa, išlaikydamas sąžiningas taisykles.',
     ),
     stats: [
@@ -433,7 +436,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
       'Pastatų grafikai, atitinkantys kiekvieną SLA',
     ),
     lede: loc(
-      'Coordinate mobile teams across sites and contracts — matching skills, travel time, and service windows while keeping labour costs predictable.',
+      'Coordinate mobile teams across sites and contracts, matching skills, travel time, and service windows while keeping labour costs predictable.',
       'Koordinuokite mobilias komandas vietose ir sutartyse — derindami įgūdžius, kelionės laiką ir aptarnavimo langus.',
     ),
     stats: [
@@ -532,7 +535,7 @@ export const INDUSTRY_SOLUTIONS: IndustrySolution[] = [
       'Sveikatos apsaugos grafikai, saugantys priežiūros kokybę',
     ),
     lede: loc(
-      'Plan nurses, carers, and support staff to patient acuity and ward demand — with mandatory rest, skill mix, and regulatory rules enforced automatically.',
+      'Plan nurses, carers, and support staff to patient acuity and ward demand, with mandatory rest, skill mix, and regulatory rules enforced automatically.',
       'Planuokite slaugytojus, globėjus ir pagalbinį personalą pagal pacientų sudėtingumą ir skyriaus paklausą — su privalomu poilsiu, įgūdžių deriniu ir reguliavimo taisyklėmis.',
     ),
     stats: [

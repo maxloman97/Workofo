@@ -1,73 +1,203 @@
-type LocaleProps = { locale?: string };
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { industryPath, localePath } from '../../lib/paths';
+import type { Locale } from '../../lib/locales';
+import type { IndustrySlug } from '../../lib/solutions';
+
+type LocaleProps = { locale?: Locale };
 
 const INDUSTRIES = [
   {
     name: 'Retail',
     slug: 'retail',
-    body: 'Match labour to demand across stores, departments and fulfilment, with built-in compliance and 15-minute scheduling accuracy.',
+    image: '/industries/retail.jpg',
+    body: 'Match labour to demand across stores, departments and fulfilment.',
   },
   {
     name: 'Hospitality & QSRs',
     slug: 'hospitality-qsrs',
-    body: 'Align front-of-house, kitchen and events staff with every rush, while keeping labour rules and preferences fair.',
+    image: '/industries/hospitality-qsrs.jpg',
+    body: 'Align front-of-house and kitchen teams with every rush.',
   },
   {
     name: 'Healthcare',
     slug: 'healthcare',
-    body: 'Plan nurses, carers and support staff to patient acuity and ward demand, with rest rules and skill mix enforced.',
+    image: '/industries/healthcare.jpg',
+    body: 'Plan clinical and support staff to patient demand and skill mix.',
   },
   {
     name: 'Warehousing & Logistics',
     slug: 'warehousing-logistics',
-    body: 'Match pickers, packers and yard teams to inbound waves and outbound cut-offs, with certifications built in.',
+    image: '/industries/warehousing-logistics.jpg',
+    body: 'Match warehouse teams to inbound waves and outbound cut-offs.',
   },
   {
     name: 'Facility Management',
     slug: 'facility-management',
-    body: 'Coordinate mobile teams across sites and contracts, balancing skills, travel time and service windows.',
+    image: '/industries/facility-management.jpg',
+    body: 'Coordinate mobile teams across sites, skills and service windows.',
   },
 ] as const;
 
 export function HomeIndustries({ locale = 'en' }: LocaleProps) {
+  const trackRef = useRef<HTMLUListElement>(null);
+  const [active, setActive] = useState(0);
+
+  const syncActive = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const slides = [...track.querySelectorAll<HTMLElement>('.home-industries__slide')];
+    if (!slides.length) return;
+    const left = track.scrollLeft;
+    let best = 0;
+    let bestDist = Infinity;
+    slides.forEach((slide, i) => {
+      const dist = Math.abs(slide.offsetLeft - left);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
+      }
+    });
+    setActive(best);
+  }, []);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    syncActive();
+    track.addEventListener('scroll', syncActive, { passive: true });
+    window.addEventListener('resize', syncActive);
+    return () => {
+      track.removeEventListener('scroll', syncActive);
+      window.removeEventListener('resize', syncActive);
+    };
+  }, [syncActive]);
+
+  const scrollToIndex = (index: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const slide = track.querySelectorAll<HTMLElement>('.home-industries__slide')[index];
+    if (!slide) return;
+    track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+  };
+
+  const step = (dir: -1 | 1) => {
+    scrollToIndex(Math.min(INDUSTRIES.length - 1, Math.max(0, active + dir)));
+  };
+
   return (
     <section className="home-industries" aria-labelledby="home-industries-heading">
       <div className="home-journey__inner">
         <header className="home-journey__intro">
           <div>
             <p className="t-overline home-journey__eyebrow">Industries</p>
-            <h2 id="home-industries-heading">Built for every shift-based operation</h2>
+            <h2 id="home-industries-heading">AI employee scheduling built for how your industry works.</h2>
           </div>
           <p className="lede home-journey__lede">
-            Demand looks different in a store, a ward or a warehouse. Workofo models the workload drivers and rules
-            of your industry, so schedules fit how your operation actually runs.
+            Workofo is workforce scheduling software for shift-based operations where staffing needs change with demand.
+            Forecast workload, optimize staffing levels and build schedules around how your business actually operates.
           </p>
         </header>
 
-        <ul className="home-industries__list">
-          {INDUSTRIES.map((industry) => (
-            <li key={industry.slug}>
-              <a className="home-industries__row" href={`/${locale}/solutions/${industry.slug}`}>
-                <span className="home-industries__name">{industry.name}</span>
-                <span className="home-industries__meta">
-                  <span className="home-industries__body">{industry.body}</span>
-                  <span className="home-industries__link">
-                  <span className="visually-hidden">{industry.name} scheduling</span>
-                  <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-                    <path
-                      d="M4 9h10M10 5l4 4-4 4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+        <div className="home-industries__carousel">
+          <ul
+            ref={trackRef}
+            className="home-industries__track"
+            aria-label="Industry solutions"
+          >
+            {INDUSTRIES.map((industry) => (
+              <li key={industry.slug} className="home-industries__slide">
+                <a
+                  className="home-industries__card"
+                  href={industryPath(locale, industry.slug as IndustrySlug)}
+                >
+                  <img
+                    className="home-industries__photo"
+                    src={industry.image}
+                    alt=""
+                    width={640}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
+                    draggable={false}
+                  />
+                  <span className="home-industries__shade" aria-hidden="true" />
+                  <span className="home-industries__card-copy">
+                    <span className="home-industries__name">{industry.name}</span>
+                    <span className="home-industries__body">{industry.body}</span>
+                    <span className="home-industries__cta">
+                      See how it works
+                      <svg width="14" height="14" viewBox="0 0 14 14" focusable="false" aria-hidden="true">
+                        <path
+                          d="M3 7h8M8 3.5 11.5 7 8 10.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
                   </span>
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="home-industries__controls">
+            <div className="home-industries__arrows">
+              <button
+                type="button"
+                className="home-industries__arrow"
+                aria-label="Previous industry"
+                disabled={active <= 0}
+                onClick={() => step(-1)}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" focusable="false" aria-hidden="true">
+                  <path
+                    d="M11.5 4.5 7 9l4.5 4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="home-industries__arrow"
+                aria-label="Next industry"
+                disabled={active >= INDUSTRIES.length - 1}
+                onClick={() => step(1)}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" focusable="false" aria-hidden="true">
+                  <path
+                    d="M6.5 4.5 11 9l-4.5 4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="home-industries__dots" role="tablist" aria-label="Industry slides">
+              {INDUSTRIES.map((industry, i) => (
+                <button
+                  key={industry.slug}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === active}
+                  aria-label={`Show ${industry.name}`}
+                  className={`home-industries__dot${i === active ? ' is-active' : ''}`}
+                  onClick={() => scrollToIndex(i)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -148,8 +278,9 @@ export function HomeProof() {
 
 type Faq = { q: string; a: string; html?: string };
 
-function buildFaqs(locale: string): Faq[] {
-  const sol = (slug: string, label: string) => `<a href="/${locale}/solutions/${slug}">${label}</a>`;
+function buildFaqs(locale: Locale): Faq[] {
+  const sol = (slug: IndustrySlug, label: string) =>
+    `<a href="${industryPath(locale, slug)}">${label}</a>`;
   return [
     {
       q: 'What is AI employee scheduling software?',
@@ -201,7 +332,7 @@ export function HomeFaq({ locale = 'en' }: LocaleProps) {
           <p className="lede home-journey__lede">
             Still deciding? See Workofo with your own scheduling rules and demand data.
           </p>
-          <a className="btn btn--primary home-faq__cta" href={`/${locale}/get-in-touch`}>
+          <a className="btn btn--primary home-faq__cta" href={localePath(locale, '/get-in-touch')}>
             Book a demo
           </a>
         </header>

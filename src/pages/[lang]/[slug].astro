@@ -1,154 +1,29 @@
 ---
 /**
- * Dynamic CMS page: /[lang]/[slug]
- * SSR against SitePages / SiteSections — dashboard edits need no redeploy.
+ * Prefixed CMS pages for LT/SE. English requests redirect to unprefixed URLs.
  */
-import SiteLayout from '../../layouts/SiteLayout.astro';
-import SectionRenderer from '../../components/sections/SectionRenderer.astro';
-import { isLocale, DEFAULT_LOCALE, ui, type Locale } from '../../lib/locales';
-import { loadPageBySlug, listNavPages, SITE_PAGES } from '../../lib/cms';
-import { DEMO_FORM_ID } from '../../lib/config';
-import { forms } from '@wix/forms';
+import CmsPage from '../../components/CmsPage.astro';
+import { isLocale, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
 
 const rawLang = Astro.params.lang;
 const slug = Astro.params.slug;
 
 if (!isLocale(rawLang) || !slug) {
-  return Astro.redirect(`/${DEFAULT_LOCALE}/home`, 302);
+  return Astro.redirect('/', 302);
 }
 
 const locale = rawLang as Locale;
 
+// Default locale must not live under /en/…
+if (locale === 'en') {
+  if (slug === 'home') return Astro.redirect('/', 301);
+  return Astro.redirect(localePath('en', `/${slug}`), 301);
+}
+
 if (slug === 'blog') {
-  return Astro.redirect(`/${locale}/blog`, 302);
+  return Astro.redirect(localePath(locale, '/blog'), 302);
 }
 
-let result;
-try {
-  result = await loadPageBySlug(locale, slug);
-} catch (err) {
-  result = {
-    status: 'cms_error' as const,
-    error: {
-      kind: 'query_failed' as const,
-      collection: SITE_PAGES,
-      message: 'Unexpected CMS error while loading the page.',
-      detail: String((err as Error)?.message ?? err),
-    },
-  };
-}
-
-const navPages = await listNavPages(locale);
-
-let formFields: any[] = [];
-let formLoadError = '';
-const needsForm =
-  result.status === 'ok' && result.sections.some((s) => s.type === 'demoForm');
-
-if (needsForm) {
-  try {
-    const form = await forms.getForm(DEMO_FORM_ID);
-    const fields = ((form as any).fields ?? [])
-      .filter((f: any) => f.target && !f.hidden)
-      .map((f: any) => ({
-        target: f.target,
-        label: f.view?.label ?? f.target,
-        placeholder: f.view?.placeholder ?? '',
-        required: f.validation?.required ?? false,
-        format: f.validation?.string?.format,
-        minLength: f.validation?.string?.minLength,
-        maxLength: f.validation?.string?.maxLength,
-        pattern: f.validation?.string?.pattern,
-        viewFieldType: f.view?.fieldType,
-        options: f.view?.options?.map((o: any) => ({
-          value: o.value ?? o.label ?? '',
-          label: o.label ?? o.value ?? '',
-        })),
-      }));
-    formFields = fields;
-  } catch (err) {
-    formLoadError = `Could not load form schema for PUBLIC_WIX_DEMO_FORM_ID=${DEMO_FORM_ID}. Detail: ${String((err as Error)?.message ?? err)}`;
-  }
-}
-
-const pageTitle =
-  result.status === 'ok'
-    ? result.page.title || slug
-    : result.status === 'not_translated'
-      ? ui('notTranslated', locale)
-      : result.status === 'not_found'
-        ? ui('pageNotFound', locale)
-        : 'CMS setup needed';
-
-/** English homepage SEO — primary keyword cluster without waiting on CMS title edits. */
-const isEnHome = locale === 'en' && slug === 'home';
-const seoTitle = isEnHome
-  ? 'Employee Scheduling Software | AI Workforce Optimization — Workofo'
-  : pageTitle;
-const seoDescription = isEnHome
-  ? 'AI-powered employee scheduling software that forecasts labor demand and automatically creates optimized staff schedules around when and where work happens.'
-  : undefined;
 ---
-
-<SiteLayout
-  locale={locale}
-  title={seoTitle}
-  description={seoDescription}
-  pathWithoutLang={`/${slug}`}
-  navPages={navPages}
->
-  {
-    result.status === 'ok' && (
-      <SectionRenderer
-        sections={result.sections}
-        formFields={formFields}
-        formId={DEMO_FORM_ID}
-        formLoadError={formLoadError}
-        locale={locale}
-        pageSlug={slug}
-        pageLabel={result.page.navLabel || result.page.title || slug}
-      />
-    )
-  }
-
-  {
-    result.status === 'not_translated' && (
-      <section class="not-translated">
-        <h1>{ui('notTranslated', locale)}</h1>
-        <p>
-          This page (“{slug}”) does not have a <strong>{locale}</strong> version in SitePages yet.
-          Add a SitePages item with language={locale} and matching slug, then attach SiteSections.
-        </p>
-        <p>
-          <a class="btn btn--primary" href={`/${DEFAULT_LOCALE}/${slug}`}>{ui('viewLt', locale)}</a>
-        </p>
-      </section>
-    )
-  }
-
-  {
-    result.status === 'not_found' && (
-      <section class="not-translated">
-        <h1>{ui('pageNotFound', locale)}</h1>
-        <p>
-          No SitePages item with slug “{slug}” for language “{locale}”.
-        </p>
-        <p>
-          <a href={`/${locale}/home`}>{ui('backHome', locale)}</a>
-        </p>
-      </section>
-    )
-  }
-
-  {
-    result.status === 'cms_error' && (
-      <section class="shell__inner" style="padding: 4rem 1.5rem;">
-        <h1>CMS setup needed</h1>
-        <p class="dev-msg">
-          {result.error.message}
-          {result.error.detail ? ` — ${result.error.detail}` : ''}
-        </p>
-      </section>
-    )
-  }
-</SiteLayout>
+<CmsPage locale={locale} slug={slug} />

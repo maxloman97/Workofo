@@ -1,14 +1,10 @@
 ---
-/**
- * Blog post detail — SEO wired for dashboard-managed tags.
- */
-import SiteLayout from '../../../layouts/SiteLayout.astro';
-import RicosContentViewer from '../../../components/RicosContentViewer';
-import { isLocale, type Locale } from '../../../lib/locales';
-import { getBlogPostBySlug, formatPostDate } from '../../../lib/blog';
-import { listNavPages } from '../../../lib/cms';
-import { imgSrc } from '../../../lib/rich';
-import { localePath } from '../../../lib/paths';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import RicosContentViewer from '../../components/RicosContentViewer';
+import { getBlogPostBySlug, formatPostDate } from '../../lib/blog';
+import { listNavPages } from '../../lib/cms';
+import { imgSrc } from '../../lib/rich';
+import { localePath } from '../../lib/paths';
 import { WIX_APPS } from '@wix/essentials';
 import { seoTags } from '@wix/seo';
 import { SEO } from '@wix/seo/components';
@@ -20,16 +16,10 @@ export const wixMetadata = {
   identifiers: { postSlug: WIX_APPS.blogs.postPageMetadata.identifiers.slug },
 };
 
-const rawLang = Astro.params.lang;
+const locale = 'en' as const;
 const postSlug = Astro.params.postSlug;
-
-if (!isLocale(rawLang) || !postSlug) {
-  return Astro.redirect('/blog', 302);
-}
-const locale = rawLang as Locale;
-
-if (locale === 'en') {
-  return Astro.redirect(localePath('en', `/blog/${postSlug}`), 301);
+if (!postSlug) {
+  return Astro.redirect(localePath(locale, '/blog'), 302);
 }
 
 const [{ post, error }, navPages, seoTagsServiceConfig] = await Promise.all([
@@ -46,7 +36,6 @@ if (!post && !error) {
   return Astro.redirect(localePath(locale, '/blog'), 302);
 }
 
-const title = (post as any)?.title || 'Blog post';
 const cover = imgSrc((post as any)?.media?.wixMedia?.image || (post as any)?.coverImage, 1200, 630);
 ---
 

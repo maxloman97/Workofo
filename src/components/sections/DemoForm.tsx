@@ -35,10 +35,10 @@ function fieldError(field: FieldModel, raw: string, locale: Locale): string {
   }
   if (!v) return '';
   if (field.minLength && v.length < field.minLength) {
-    return `${field.label} — min ${field.minLength}`;
+    return `${field.label}: min ${field.minLength}`;
   }
   if (field.maxLength && v.length > field.maxLength) {
-    return `${field.label} — max ${field.maxLength}`;
+    return `${field.label}: max ${field.maxLength}`;
   }
   if (field.format === 'EMAIL' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
     return locale === 'lt'

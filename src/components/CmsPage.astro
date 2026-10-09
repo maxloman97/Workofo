@@ -1,0 +1,149 @@
+---
+/**
+ * Shared CMS page body for EN (unprefixed) and LT/SE (`/[lang]/[slug]`).
+ */
+import SiteLayout from '../layouts/SiteLayout.astro';
+import SectionRenderer from './sections/SectionRenderer.astro';
+import { ui, type Locale } from '../lib/locales';
+import { loadPageBySlug, listNavPages, SITE_PAGES } from '../lib/cms';
+import { DEMO_FORM_ID } from '../lib/config';
+import { localePath } from '../lib/paths';
+import { forms } from '@wix/forms';
+
+type Props = {
+  locale: Locale;
+  slug: string;
+};
+
+const { locale, slug } = Astro.props as Props;
+
+let result;
+try {
+  result = await loadPageBySlug(locale, slug);
+} catch (err) {
+  result = {
+    status: 'cms_error' as const,
+    error: {
+      kind: 'query_failed' as const,
+      collection: SITE_PAGES,
+      message: 'Unexpected CMS error while loading the page.',
+      detail: String((err as Error)?.message ?? err),
+    },
+  };
+}
+
+const navPages = await listNavPages(locale);
+
+let formFields: any[] = [];
+let formLoadError = '';
+const needsForm =
+  result.status === 'ok' && result.sections.some((s) => s.type === 'demoForm');
+
+if (needsForm) {
+  try {
+    const form = await forms.getForm(DEMO_FORM_ID);
+    const fields = ((form as any).fields ?? [])
+      .filter((f: any) => f.target && !f.hidden)
+      .map((f: any) => ({
+        target: f.target,
+        label: f.view?.label ?? f.target,
+        placeholder: f.view?.placeholder ?? '',
+        required: f.validation?.required ?? false,
+        format: f.validation?.string?.format,
+        minLength: f.validation?.string?.minLength,
+        maxLength: f.validation?.string?.maxLength,
+        pattern: f.validation?.string?.pattern,
+        viewFieldType: f.view?.fieldType,
+        options: f.view?.options?.map((o: any) => ({
+          value: o.value ?? o.label ?? '',
+          label: o.label ?? o.value ?? '',
+        })),
+      }));
+    formFields = fields;
+  } catch (err) {
+    formLoadError = `Could not load form schema for PUBLIC_WIX_DEMO_FORM_ID=${DEMO_FORM_ID}. Detail: ${String((err as Error)?.message ?? err)}`;
+  }
+}
+
+const pageTitle =
+  result.status === 'ok'
+    ? result.page.title || slug
+    : result.status === 'not_translated'
+      ? ui('notTranslated', locale)
+      : result.status === 'not_found'
+        ? ui('pageNotFound', locale)
+        : 'CMS setup needed';
+
+const isEnHome = locale === 'en' && slug === 'home';
+const seoTitle = isEnHome
+  ? 'Employee Scheduling Software | AI Workforce Optimization | Workofo'
+  : pageTitle;
+const seoDescription = isEnHome
+  ? 'AI-powered employee scheduling software that forecasts labor demand and automatically creates optimized staff schedules around when and where work happens.'
+  : undefined;
+
+const pathWithoutLang = slug === 'home' ? '/' : `/${slug}`;
+---
+
+<SiteLayout
+  locale={locale}
+  title={seoTitle}
+  description={seoDescription}
+  pathWithoutLang={pathWithoutLang}
+  navPages={navPages}
+>
+  {
+    result.status === 'ok' && (
+      <SectionRenderer
+        sections={result.sections}
+        formFields={formFields}
+        formId={DEMO_FORM_ID}
+        formLoadError={formLoadError}
+        locale={locale}
+        pageSlug={slug}
+        pageLabel={result.page.navLabel || result.page.title || slug}
+      />
+    )
+  }
+
+  {
+    result.status === 'not_translated' && (
+      <section class="not-translated">
+        <h1>{ui('notTranslated', locale)}</h1>
+        <p>
+          This page (“{slug}”) does not have a <strong>{locale}</strong> version in SitePages yet.
+          Add a SitePages item with language={locale} and matching slug, then attach SiteSections.
+        </p>
+        <p>
+          <a class="btn btn--primary" href={localePath('en', `/${slug}`)}>{ui('viewLt', locale)}</a>
+        </p>
+      </section>
+    )
+  }
+
+  {
+    result.status === 'not_found' && (
+      <section class="not-translated">
+        <h1>{ui('pageNotFound', locale)}</h1>
+        <p>
+          No SitePages item with slug “{slug}” for language “{locale}”.
+        </p>
+        <p>
+          <a href={localePath(locale, '/')}>{ui('backHome', locale)}</a>
+        </p>
+      </section>
+    )
+  }
+
+  {
+    result.status === 'cms_error' && (
+      <section class="shell__inner" style="padding: 4rem 1.5rem;">
+        <h1>CMS setup needed</h1>
+        <p class="dev-msg">
+          {result.error.message}
+          {result.error.detail ? `: ${result.error.detail}` : ''}
+        </p>
+      </section>
+    )
+  }
+</SiteLayout>

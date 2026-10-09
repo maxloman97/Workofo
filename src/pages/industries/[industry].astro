@@ -1,0 +1,41 @@
+---
+/**
+ * English industry pages (unprefixed): `/industries/{slug}`.
+ */
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import IndustrySolutionPage from '../../components/solutions/IndustrySolutionPage.astro';
+import RetailPage from '../../components/solutions/RetailPage.astro';
+import { isIndustrySlug, resolveIndustrySolution } from '../../lib/solutions';
+import { listNavPages } from '../../lib/cms';
+
+const industry = Astro.params.industry;
+if (!isIndustrySlug(industry)) {
+  return Astro.redirect('/industries/retail', 302);
+}
+
+const navPages = await listNavPages('en');
+---
+
+{
+  industry === 'retail' ? (
+    <SiteLayout
+      locale="en"
+      title="Retail Scheduling Software | AI Workforce Scheduling | Workofo"
+      description="AI-powered retail scheduling that puts the right people on the floor from morning delivery to evening rush, across every store."
+      pathWithoutLang="/industries/retail"
+      navPages={navPages}
+    >
+      <RetailPage locale="en" />
+    </SiteLayout>
+  ) : (
+    <SiteLayout
+      locale="en"
+      title={resolveIndustrySolution(industry, 'en').metaTitle}
+      description={resolveIndustrySolution(industry, 'en').metaDescription}
+      pathWithoutLang={`/industries/${industry}`}
+      navPages={navPages}
+    >
+      <IndustrySolutionPage solution={resolveIndustrySolution(industry, 'en')} locale="en" />
+    </SiteLayout>
+  )
+}

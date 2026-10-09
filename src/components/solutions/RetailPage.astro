@@ -1,0 +1,113 @@
+---
+/**
+ * Retail industry subpage — first redesigned industry surface.
+ * Not a homepage split-hero; breadcrumb + photo band + reality columns.
+ */
+import { ui, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props as Props;
+const demoHref = localePath(locale, '/get-in-touch');
+const homeHref = localePath(locale, '/');
+
+const REALITY = [
+  {
+    title: 'Busy hours',
+    body: 'Morning deliveries, lunch peaks and evening rushes rarely match a fixed template. Staffing has to move with the store’s day.',
+    icon: 'clock',
+  },
+  {
+    title: 'More than serving customers',
+    body: 'Stock, fulfilment and the sales floor compete for the same people. Schedules need to cover the whole operation, not just the till.',
+    icon: 'layers',
+  },
+  {
+    title: 'Different stores. One clear view.',
+    body: 'Every location has its own rhythm. You still need one clear picture of coverage, skills and cost across the estate.',
+    icon: 'grid',
+  },
+] as const;
+---
+
+<article class="retail-page">
+  <header class="retail-hero shell__inner">
+    <nav class="retail-breadcrumb" aria-label="Breadcrumb">
+      <a href={homeHref}>Home</a>
+      <span aria-hidden="true">/</span>
+      <span>Industries</span>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Retail</span>
+    </nav>
+
+    <p class="t-overline retail-hero__eyebrow">Workforce scheduling for retail</p>
+    <h1>Better staffing. Stronger stores.</h1>
+    <p class="lede retail-hero__lede">
+      From the morning delivery to the evening rush, put the right people on the floor when your stores need them.
+    </p>
+    <div class="retail-hero__actions">
+      <a class="btn btn--primary btn--cta" href={demoHref}>{ui('bookDemo', locale)}</a>
+      <a class="btn btn--ghost btn--cta" href="#retail-reality">Explore retail challenges</a>
+    </div>
+  </header>
+
+  <figure class="retail-photo">
+    <div class="retail-photo__frame">
+      <img
+        src="/industries/retail.jpg"
+        alt="Retail store floor during trading hours"
+        width="1152"
+        height="864"
+        loading="eager"
+        decoding="async"
+      />
+      <figcaption class="retail-photo__pill">Built around your store&rsquo;s day</figcaption>
+    </div>
+  </figure>
+
+  <section id="retail-reality" class="retail-reality" aria-labelledby="retail-reality-heading">
+    <div class="retail-reality__inner shell__inner">
+      <header class="retail-reality__intro">
+        <p class="t-overline retail-reality__eyebrow">The reality of retail</p>
+        <h2 id="retail-reality-heading">Every store has its own rhythm.</h2>
+      </header>
+
+      <ul class="retail-reality__grid">
+        {
+          REALITY.map((item) => (
+            <li class="retail-reality__card">
+              <span class={`retail-reality__icon retail-reality__icon--${item.icon}`} aria-hidden="true">
+                {item.icon === 'clock' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                    <circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="1.6" />
+                    <path d="M12 7.5V12l3 1.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                )}
+                {item.icon === 'layers' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                    <path d="M12 4.5 4.75 8.25 12 12l7.25-3.75L12 4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                    <path d="M4.75 12 12 15.75 19.25 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M4.75 15.75 12 19.5l7.25-3.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                )}
+                {item.icon === 'grid' && (
+                  <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                    <rect x="4.5" y="4.5" width="6" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                    <rect x="13.5" y="4.5" width="6" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                    <rect x="4.5" y="13.5" width="6" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                    <rect x="13.5" y="13.5" width="6" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  </svg>
+                )}
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</article>

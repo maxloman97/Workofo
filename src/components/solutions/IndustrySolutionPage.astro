@@ -1,6 +1,7 @@
 ---
 import type { ResolvedIndustrySolution } from '../../lib/solutions';
 import { ui, type Locale } from '../../lib/locales';
+import { localePath } from '../../lib/paths';
 
 type Props = {
   solution: ResolvedIndustrySolution;
@@ -8,7 +9,7 @@ type Props = {
 };
 
 const { solution, locale } = Astro.props;
-const demoHref = `/${locale}/get-in-touch`;
+const demoHref = localePath(locale, '/get-in-touch');
 ---
 
 <article class="solution-page">
